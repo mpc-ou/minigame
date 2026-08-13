@@ -1,20 +1,25 @@
-/* style.css - Reset, bien mau, layout tong */
+/* style.css - Reset, bien mau, layout tong (theme "Cyber") */
 
 :root {
-  --bg-main: #0d0d0d;
-  --bg-card: #141414;
-  --bg-input: #1c1c1c;
-  --border-color: #2a2a2a;
+  --bg-main: #08080f;
+  --bg-card: #111120;
+  --bg-input: #181829;
+  --border-color: #2a2a45;
   --accent: #ff7a1a;
   --accent-dark: #2c1400;
-  --text-primary: #f2f2f2;
-  --text-secondary: #9a9a9a;
-  --success: #2ecc71;
-  --success-bg: #1e3a26;
-  --danger: #e74c3c;
+  --accent-cyan: #00eaff;
+  --accent-purple: #b026ff;
+  --text-primary: #f0f0f7;
+  --text-secondary: #9090b0;
+  --success: #2effa0;
+  --success-bg: #123322;
+  --danger: #ff3860;
   --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 8px;
+  --glow-orange: 0 0 14px rgba(255, 122, 26, 0.45);
+  --glow-cyan: 0 0 14px rgba(0, 234, 255, 0.35);
+  --glow-purple: 0 0 16px rgba(176, 38, 255, 0.4);
 }
 
 * {
@@ -25,7 +30,10 @@
 
 body {
   font-family: 'Montserrat', 'Segoe UI', sans-serif;
-  background: var(--bg-main);
+  background:
+    radial-gradient(circle at 15% 0%, rgba(0, 234, 255, 0.07), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(176, 38, 255, 0.08), transparent 45%),
+    var(--bg-main);
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-tap-highlight-color: transparent;

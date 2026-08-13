@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Web Search Game - WEB-DESIGN 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Press+Start+2P&family=VT323&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/welcome.css" />
     <link rel="stylesheet" href="css/game.css" />
@@ -16,13 +18,54 @@
 
 <body>
 
-    <!-- MAN HINH CHAO -->
-    <section id="welcome-screen" class="screen active">
-        <div class="welcome-card">
-            <img src="assets/logo/logo.png" alt="Logo CLB Lập Trình Trên Thiết Bị Di Động" class="welcome-logo" />
-            <p class="welcome-title">WEB-DESIGN 2026</p>
-            <p class="welcome-subtitle">Tìm từ khóa ẩn trong ma trận chữ</p>
-            <form id="start-form">
+    <!-- MAN HINH CHOI - vao thang, khong can nhap gi truoc -->
+    <section id="game-screen" class="screen active">
+        <div class="game-container">
+            <div class="game-header">
+                <p class="game-title">WEB-DESIGN 2026</p>
+                <div class="progress-badge" id="progress">0/5</div>
+            </div>
+
+            <div class="keyword-list" id="keyword-list"></div>
+
+            <div class="grid-wrapper">
+                <div class="grid" id="grid"></div>
+            </div>
+            <p class="hint-text">Tap từng ô để chọn từ khóa</p>
+
+            <!-- Panel hien sau khi thang, thay doi theo tung buoc: luu minh
+                 chung -> xuat anh -> da xuat xong -->
+            <div id="post-win-panel" class="post-win-panel hidden">
+                <p class="post-win-status" id="post-win-status"></p>
+                <button id="save-proof-btn" class="btn-primary hidden">Lưu minh chứng</button>
+                <button id="export-action-btn" class="btn-export hidden">Xuất ảnh</button>
+            </div>
+
+            <button id="reset-btn" class="btn-reset">Xóa kết quả / Chơi lại</button>
+        </div>
+    </section>
+
+    <!-- Canvas phao hoa, chi ve khi thang, tu dong tat sau vai giay -->
+    <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+
+    <!-- VICTORY DIALOG - chi la thong bao chuc mung, khong con nut xuat anh -->
+    <div id="victory-dialog" class="dialog-overlay hidden">
+        <div class="dialog-box">
+            <div class="dialog-trophy">🏆</div>
+            <p class="dialog-title">Chúc mừng!</p>
+            <p class="dialog-text">Bạn đã hoàn thành thử thách. Bấm "Lưu minh chứng" bên dưới để lưu kết quả.</p>
+            <div class="dialog-actions">
+                <button id="close-victory-btn" class="btn-close">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFO DIALOG - nhap ho ten + MSSV, chi hien khi bam "Luu minh chung" -->
+    <div id="info-dialog" class="dialog-overlay hidden">
+        <div class="dialog-box">
+            <p class="dialog-title">Lưu minh chứng</p>
+            <p class="dialog-text">Nhập họ tên và MSSV. Thông tin này chỉ được nhập 1 lần cho mỗi lượt chơi.</p>
+            <form id="info-form">
                 <div class="form-group">
                     <label for="full-name">Họ và tên</label>
                     <input type="text" id="full-name" required placeholder="Nguyễn Văn A" />
@@ -33,42 +76,10 @@
                         placeholder="xxxxxxxxxx" />
                 </div>
                 <p id="form-error" class="form-error hidden"></p>
-                <button type="submit" class="btn-primary">BẮT ĐẦU</button>
-            </form>
-        </div>
-    </section>
-
-    <!-- MAN HINH CHOI -->
-    <section id="game-screen" class="screen">
-        <div class="game-container">
-            <div class="game-header">
-                <div>
-                    <p class="game-title">WEB-DESIGN 2026</p>
-                    <p class="player-info" id="player-name"></p>
-                    <p class="player-info" id="player-id"></p>
+                <div class="dialog-actions">
+                    <button type="submit" class="btn-primary">Xác nhận</button>
                 </div>
-                <div class="progress-badge" id="progress">0/5</div>
-            </div>
-
-            <div class="keyword-list" id="keyword-list"></div>
-
-            <div class="grid-wrapper">
-                <div class="grid" id="grid"></div>
-            </div>
-            <p class="hint-text">Tap từng ô để chọn từ khóa</p>
-        </div>
-    </section>
-
-    <!-- VICTORY DIALOG -->
-    <div id="victory-dialog" class="dialog-overlay hidden">
-        <div class="dialog-box">
-            <div class="dialog-trophy">🏆</div>
-            <p class="dialog-title">Chúc mừng!</p>
-            <p class="dialog-text">Bạn đã hoàn thành thử thách.</p>
-            <div class="dialog-actions">
-                <button id="export-btn" class="btn-export">Lưu ảnh kết quả</button>
-                <button id="close-victory-btn" class="btn-close">Đóng</button>
-            </div>
+            </form>
         </div>
     </div>
 

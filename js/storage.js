@@ -31,14 +31,15 @@ export function clearState() { //Xóa dữ liệu trong localStorage theo key ST
   localStorage.removeItem(STORAGE_KEY);
 }
 
-export function createInitialState(fullName, studentId) { //hàm tạo trạng thái ban đầu của trò chơi, được gọi khi người dùng bắt đầu chơi lần đầu tiên.
+export function createInitialState() { //hàm tạo trạng thái ban đầu của trò chơi, được gọi ngay khi tải trang lần đầu (chưa biết ten/MSSV nguoi choi).
   return {
-    fullName,
-    studentId,
+    fullName: '',
+    studentId: '',
     startTime: Date.now(),
     winTime: null,
     isWin: false,
     foundKeywords: [],
-    matrixSeed: null, // se duoc gan sau khi generate matrix
+    infoSubmitted: false, // da nhap ten/MSSV chua (chi duoc phep 1 lan/van)
+    exported: false,      // da xuat anh thanh cong chua (chi duoc phep 1 lan/van)
   };
 }

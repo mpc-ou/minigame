@@ -53,19 +53,18 @@ function buildCaptureCard(state, grid, placements) {
   return card;
 }
 
-export async function exportResultImage(state, grid, placements) {
-  const exportBtn = document.getElementById('export-btn');
+// Render anh PNG bang html2canvas roi mo o tab moi de nguoi choi tu tai ve
+// (khong dung Web Share API). Tra ve true neu thanh cong, false neu loi.
+export async function exportResultImage(state, grid, placements, exportBtn) {
   const originalText = exportBtn ? exportBtn.textContent : '';
   if (exportBtn) {
     exportBtn.disabled = true;
     exportBtn.textContent = 'Đang tạo ảnh...';
   }
 
-  // Neu trinh duyet khong ho tro Web Share API (files), phai mo san 1 tab
-  // trong ngay luc con "user gesture" - vi Safari/iOS se am tham chan
-  // window.open neu goi sau cac buoc await cua html2canvas ben duoi.
-  const supportsFileShare = typeof navigator.canShare === 'function';
-  const preOpenedTab = supportsFileShare ? null : window.open('', '_blank');
+  // Phai mo san 1 tab ngay luc con "user gesture" - Safari/iOS se am tham
+  // chan window.open neu goi sau cac buoc await cua html2canvas ben duoi.
+  const preOpenedTab = window.open('', '_blank');
 
   let card;
   try {
@@ -73,7 +72,7 @@ export async function exportResultImage(state, grid, placements) {
 
     card = buildCaptureCard(state, grid, placements);
     const canvas = await html2canvas(card, {
-      backgroundColor: '#0D0D0D',
+      backgroundColor: '#0d0d14',
       scale: 2,
       useCORS: true,
     });
@@ -85,30 +84,21 @@ export async function exportResultImage(state, grid, placements) {
       }, 'image/png');
     });
 
-    const fileName = `WebDesign2026_${state.studentId}.png`;
-    const file = new File([blob], fileName, { type: 'image/png' });
-
-    if (supportsFileShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: 'Kết quả Web-Design 2026' });
-        return;
-      } catch (shareError) {
-        if (shareError.name === 'AbortError') return;
-        throw shareError;
-      }
-    }
-
     const blobUrl = URL.createObjectURL(blob);
+
     if (preOpenedTab) {
       preOpenedTab.location.href = blobUrl;
     } else {
+      // Popup bi chan -> thu mo lai (co the van bi chan, khong con user gesture)
       window.open(blobUrl, '_blank');
     }
     setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    return true;
   } catch (err) {
     if (preOpenedTab) preOpenedTab.close();
     alert('Lỗi khi xuất ảnh: ' + err.message);
     console.error('exportResultImage lỗi:', err);
+    return false;
   } finally {
     if (card) card.remove();
     if (exportBtn) {

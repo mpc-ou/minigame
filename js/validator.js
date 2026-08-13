@@ -2,14 +2,14 @@
 import { KEYWORDS } from './config.js';
 
 // selection: [{row, col, letter}]
-// Tra ve tu khoa khop (hoac null), ho tro doc ca xuoi va nguoc
+// Tra ve tu khoa khop (hoac null) - chi so khop doc xuoi (dung 1 chieu duy
+// nhat, khong con ho tro doc nguoc)
 export function checkMatch(selection, foundKeywords) {
   const forward = selection.map((c) => c.letter).join('');
-  const backward = [...forward].reverse().join('');
 
   for (const word of KEYWORDS) {
     if (foundKeywords.includes(word)) continue;
-    if (word === forward || word === backward) {
+    if (word === forward) {
       return word;
     }
   }

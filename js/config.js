@@ -7,16 +7,12 @@ export const KEYWORDS = ['HTML', 'COLOR', 'LAYOUT', 'BUTTON', 'DESIGN']; //5 t�
 
 export const COMPETITION_NAME = 'WEB-DESIGN 2026';
 
-// 8 huong: [dRow, dCol]
+// Chi 4 huong doc xuoi tu tren-trai xuong duoi-phai (khong cho doc nguoc)
 export const DIRECTIONS = [
   { dr: 0, dc: 1 },   // trai -> phai
-  { dr: 0, dc: -1 },  // phai -> trai
   { dr: 1, dc: 0 },   // tren -> duoi
-  { dr: -1, dc: 0 },  // duoi -> tren
-  { dr: 1, dc: 1 },   // cheo tren-trai -> duoi-phai
-  { dr: -1, dc: -1 }, // cheo duoi-phai -> tren-trai
-  { dr: 1, dc: -1 },  // cheo tren-phai -> duoi-trai
-  { dr: -1, dc: 1 },  // cheo duoi-trai -> tren-phai
+  { dr: 1, dc: 1 },   // cheo xuong-phai
+  { dr: 1, dc: -1 },  // cheo xuong-trai
 ];
 
 export const STORAGE_KEY = 'webdesign2026_wordsearch_state'; //key duy nhất dùng khi lưu vào localStorage
@@ -25,3 +21,9 @@ export const MAX_PLACEMENT_ATTEMPTS = 200; // so lan thu dat 1 tu truoc khi coi 
 export const MAX_MATRIX_REGENERATE = 50;   // so lan regenerate toan bo ma tran
 
 export const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+// He thong goi y theo thoi gian: cu HINT_INTERVAL_MS troi qua ma con tu chua
+// tim duoc thi tu dong che 40-50% ky tu ngau nhien cua 1 tu ngau nhien de goi y
+export const HINT_INTERVAL_MS = 30000;
+export const HINT_MASK_MIN_RATIO = 0.4;
+export const HINT_MASK_MAX_RATIO = 0.5;

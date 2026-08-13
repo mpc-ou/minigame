@@ -1,5 +1,5 @@
 // utils.js - Ham thuan tuy, dung chung cho toan bo du an
-import { ALPHABET } from './config.js';
+import { ALPHABET, HINT_MASK_MIN_RATIO, HINT_MASK_MAX_RATIO } from './config.js';
 
 /*lấy 1 ký tự ngẫu nhiên từ bảng chữ cái ALPHABET (import từ config.js) — 
 dùng để lấp đầy các ô trống trong ma trận.*/
@@ -39,4 +39,24 @@ export function generateHash(str) {
 
 export function cellKey(row, col) {
   return `${row}_${col}`;
+}
+
+// Che ngau nhien 40-50% ky tu cua 1 tu bang dau "_", dung cho he thong goi y.
+// Vi du: "BUTTON" -> "B_T_ON". Luon giu lai it nhat 1 ky tu khong bi che.
+export function maskWord(word) {
+  const length = word.length;
+  const ratio = HINT_MASK_MIN_RATIO + Math.random() * (HINT_MASK_MAX_RATIO - HINT_MASK_MIN_RATIO);
+  const maskCount = Math.min(length - 1, Math.max(1, Math.round(length * ratio)));
+
+  const indices = Array.from({ length }, (_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = randomInt(i + 1);
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  const maskedSet = new Set(indices.slice(0, maskCount));
+
+  return word
+    .split('')
+    .map((ch, i) => (maskedSet.has(i) ? '_' : ch))
+    .join('');
 }

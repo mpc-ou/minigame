@@ -1,37 +1,4 @@
-/* welcome.css */
-
-.welcome-card {
-  width: 100%;
-  max-width: 380px;
-  background: var(--bg-card);
-  border: 0.5px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 32px 24px;
-  text-align: center;
-}
-
-.welcome-logo {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 16px;
-  border-radius: var(--radius-md);
-  display: block;
-  object-fit: contain;
-}
-
-.welcome-title {
-  color: var(--accent);
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-}
-
-.welcome-subtitle {
-  color: var(--text-secondary);
-  font-size: 13px;
-  margin-bottom: 24px;
-}
+/* welcome.css - style cho form nhap ho ten/MSSV, dung trong info-dialog */
 
 .form-group {
   text-align: left;
@@ -57,7 +24,8 @@
 }
 
 .form-group input:focus {
-  border-color: var(--accent);
+  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
 }
 
 .btn-primary {
@@ -70,6 +38,7 @@
   border-radius: 10px;
   margin-top: 8px;
   letter-spacing: 0.5px;
+  box-shadow: var(--glow-orange);
   transition: transform 0.15s ease;
 }
 

@@ -18,8 +18,9 @@
 
 .dialog-box {
   background: var(--bg-card);
-  border: 0.5px solid var(--border-color);
+  border: 0.5px solid var(--accent-purple);
   border-radius: var(--radius-lg);
+  box-shadow: var(--glow-purple);
   padding: 32px 24px;
   width: 90%;
   max-width: 340px;
@@ -38,10 +39,12 @@
 }
 
 .dialog-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-family: 'Press Start 2P', 'Montserrat', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
   color: var(--accent);
-  margin-bottom: 8px;
+  text-shadow: var(--glow-orange);
+  margin-bottom: 12px;
 }
 
 .dialog-text {
@@ -63,6 +66,7 @@
   font-weight: 700;
   border-radius: 10px;
   font-size: 14px;
+  box-shadow: var(--glow-orange);
 }
 
 .btn-export:disabled {
@@ -79,81 +83,93 @@
   font-size: 14px;
 }
 
-/* Capture card - dung khi xuat anh, luon dat ngoai man hinh */
+/* Capture card - dung khi xuat anh, luon dat ngoai man hinh
+   Font game: "Press Start 2P" cho tieu de, "VT323" cho phan con lai */
 .capture-card {
   position: fixed;
   top: -9999px;
   left: -9999px;
-  width: 480px;
+  width: 520px;
   background: var(--bg-main);
   color: var(--text-primary);
-  padding: 24px;
-  font-family: 'Montserrat', sans-serif;
+  padding: 40px;
+  border: 3px solid var(--accent);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 40px rgba(255, 122, 26, 0.25) inset;
+  font-family: 'VT323', monospace;
 }
 
 .capture-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .capture-logo {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 10px;
   display: block;
   object-fit: contain;
 }
 
 .capture-title {
+  font-family: 'Press Start 2P', 'VT323', monospace;
   color: var(--accent);
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.4;
+  letter-spacing: 1px;
 }
 
 .capture-subtitle {
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: 16px;
+  margin-top: 6px;
 }
 
 .capture-info p {
-  font-size: 12px;
-  margin-bottom: 4px;
+  font-size: 18px;
+  margin-bottom: 8px;
   color: var(--text-primary);
 }
 
 .capture-keywords {
   display: flex;
-  gap: 6px;
-  margin: 12px 0;
+  gap: 8px;
+  margin: 16px 0;
   flex-wrap: wrap;
 }
 
 .capture-chip {
   background: var(--success-bg);
   color: var(--success);
-  font-size: 11px;
-  padding: 4px 10px;
+  font-size: 14px;
+  padding: 5px 12px;
   border-radius: 8px;
+  letter-spacing: 0.5px;
 }
 
 .capture-grid {
   display: grid;
-  grid-template-columns: repeat(var(--grid-size), 26px);
-  gap: 2px;
-  margin: 12px 0;
+  grid-template-columns: repeat(var(--grid-size), 30px);
+  gap: 3px;
+  margin: 18px 0;
+  justify-content: center;
 }
 
 .capture-cell {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg-input);
-  border-radius: 3px;
-  font-size: 11px;
+  border-radius: 4px;
+  font-size: 15px;
   color: var(--text-secondary);
 }
 
@@ -166,9 +182,9 @@
 .capture-footer {
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
-  font-size: 10px;
-  color: #555;
-  border-top: 0.5px solid var(--border-color);
-  padding-top: 10px;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #777;
+  border-top: 2px solid var(--border-color);
+  padding-top: 14px;
 }
