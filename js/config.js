@@ -5,6 +5,7 @@ export const GRID_SIZE = 8; //Kích thước ma trận (8x8)
 export const KEYWORDS = ['HTML', 'COLOR', 'LAYOUT', 'BUTTON', 'DESIGN']; //5 từ khóa cố định, 
 // thứ tự trong mảng này sẽ quyết định thứ tự hiển thị trong danh sách từ khóa trên giao diện.
 
+export const GAME_NAME = 'WORD SEARCH GAME';
 export const COMPETITION_NAME = 'WEB-DESIGN 2026';
 
 // Chi 4 huong doc xuoi tu tren-trai xuong duoi-phai (khong cho doc nguoc)

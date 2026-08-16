@@ -7,7 +7,7 @@
     <title>Web Search Game - WEB-DESIGN 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Press+Start+2P&family=VT323&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=VT323&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/welcome.css" />
@@ -18,11 +18,24 @@
 
 <body>
 
-    <!-- MAN HINH CHOI - vao thang, khong can nhap gi truoc -->
-    <section id="game-screen" class="screen active">
+    <!-- MAN HINH BIA - hien dau tien, bam Choi moi vao man choi chinh -->
+    <section id="cover-screen" class="screen active">
+        <div class="cover-card">
+            <img src="assets/logo/logo.png" alt="Logo CLB Lập Trình Trên Thiết Bị Di Động" class="cover-logo" />
+            <p class="game-title">WORD SEARCH GAME</p>
+            <p class="game-subtitle">WEB-DESIGN 2026</p>
+            <p class="cover-status" id="cover-status"></p>
+            <button id="play-btn" class="btn-primary">Chơi</button>
+            <button id="cover-reset-btn" class="btn-reset">Xóa kết quả</button>
+        </div>
+    </section>
+
+    <!-- MAN HINH CHOI - chi vao sau khi bam Choi o man hinh bia -->
+    <section id="game-screen" class="screen">
         <div class="game-container">
             <div class="game-header">
-                <p class="game-title">WEB-DESIGN 2026</p>
+                <p class="game-title">WORD SEARCH GAME</p>
+                <p class="game-subtitle">WEB-DESIGN 2026</p>
                 <div class="progress-badge" id="progress">0/5</div>
             </div>
 

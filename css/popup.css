@@ -39,9 +39,10 @@
 }
 
 .dialog-title {
-  font-family: 'Press Start 2P', 'Montserrat', sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
+  font-family: 'VT323', 'Montserrat', sans-serif;
+  font-size: 28px;
+  line-height: 1.3;
+  letter-spacing: 1px;
   color: var(--accent);
   text-shadow: var(--glow-orange);
   margin-bottom: 12px;
@@ -84,7 +85,8 @@
 }
 
 /* Capture card - dung khi xuat anh, luon dat ngoai man hinh
-   Font game: "Press Start 2P" cho tieu de, "VT323" cho phan con lai */
+   Font game: "VT323" cho toan bo (co day du dau tieng Viet, khac voi
+   "Press Start 2P" truoc day bi loi vi thieu subset Vietnamese) */
 .capture-card {
   position: fixed;
   top: -9999px;
@@ -117,18 +119,25 @@
 }
 
 .capture-title {
-  font-family: 'Press Start 2P', 'VT323', monospace;
   color: var(--accent);
   font-weight: 400;
-  font-size: 20px;
-  line-height: 1.4;
+  font-size: 32px;
+  line-height: 1.2;
   letter-spacing: 1px;
+  text-shadow: var(--glow-orange);
+}
+
+.capture-competition {
+  color: var(--accent-cyan);
+  font-size: 20px;
+  letter-spacing: 2px;
+  margin-top: 2px;
 }
 
 .capture-subtitle {
   color: var(--text-secondary);
   font-size: 16px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .capture-info p {

@@ -1,4 +1,35 @@
-/* welcome.css - style cho form nhap ho ten/MSSV, dung trong info-dialog */
+/* welcome.css - man hinh bia (cover-screen) + form nhap ho ten/MSSV (info-dialog) */
+
+.cover-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-card);
+  border: 0.5px solid var(--accent-purple);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glow-purple);
+  padding: 36px 24px;
+  text-align: center;
+}
+
+.cover-logo {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: var(--radius-md);
+  display: block;
+  object-fit: contain;
+}
+
+.cover-card .game-title {
+  margin-bottom: 4px;
+}
+
+.cover-status {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
 
 .form-group {
   text-align: left;

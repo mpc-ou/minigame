@@ -72,11 +72,12 @@ export function createGame({ dom, state }) {
     }
   }
 
-  // Danh sach tu khoa khong hien chu that ra ngoai: tu chua tim thay chi
-  // hien so thu tu, tru khi da co goi y (hien dang che bot ky tu)
+  // Danh sach tu khoa khong hien chu that ra ngoai: tu chua tim thay ngay tu
+  // dau da hien so gach duoi dung bang do dai tu (VD "______") de nguoi choi
+  // biet duong ma tim, sau do goi y theo thoi gian se lo dan 1 vai ky tu
   function renderKeywordList() {
     dom.keywordListEl.innerHTML = '';
-    KEYWORDS.forEach((word, idx) => {
+    KEYWORDS.forEach((word) => {
       const chip = document.createElement('span');
       const isFound = foundKeywords.includes(word);
       chip.className = 'keyword-chip' + (isFound ? ' found' : '');
@@ -86,7 +87,7 @@ export function createGame({ dom, state }) {
         chip.textContent = hintedWords[word];
         chip.classList.add('hinted');
       } else {
-        chip.textContent = `Từ khóa ${idx + 1}`;
+        chip.textContent = '_'.repeat(word.length);
       }
       dom.keywordListEl.appendChild(chip);
     });

@@ -1,11 +1,20 @@
 // main.js - Entry point duy nhat
-import { loadState, saveState, createInitialState } from './storage.js';
+import { loadState, saveState, clearState, createInitialState } from './storage.js';
 import { startNewMatrix, createGame } from './game.js';
 import { KEYWORDS } from './config.js';
+
+const coverScreen = document.getElementById('cover-screen');
+const gameScreen = document.getElementById('game-screen');
+const coverStatusEl = document.getElementById('cover-status');
 
 const infoForm = document.getElementById('info-form');
 const infoFullNameInput = infoForm.querySelector('#full-name');
 const infoStudentIdInput = infoForm.querySelector('#student-id');
+
+function showScreen(screenEl) {
+  document.querySelectorAll('.screen').forEach((el) => el.classList.remove('active'));
+  screenEl.classList.add('active');
+}
 
 const dom = {
   gridEl: document.getElementById('grid'),
@@ -61,13 +70,36 @@ function bootstrap() {
 
   if (!isValidSavedState(saved)) {
     // Chua co van choi nao (hoac du lieu cu khong khop) -> sinh ma tran ngau
-    // nhien ngay, khong can nhap gi
+    // nhien san, cho den khi bam Choi o man hinh bia moi thuc su vao choi
     const { grid, placements } = startNewMatrix();
     saved = { ...createInitialState(), grid, placements };
     saveState(saved);
   }
 
-  launchGame(saved);
+  return saved;
 }
 
-bootstrap();
+function renderCoverStatus(saved) {
+  if (saved.isWin) {
+    coverStatusEl.textContent = 'Bạn đã hoàn thành ván trước - bấm Chơi để xem lại kết quả.';
+  } else if (saved.foundKeywords.length > 0) {
+    coverStatusEl.textContent = `Đang chơi dở: ${saved.foundKeywords.length}/${KEYWORDS.length} từ khóa.`;
+  } else {
+    coverStatusEl.textContent = 'Sẵn sàng bắt đầu.';
+  }
+}
+
+const savedState = bootstrap();
+renderCoverStatus(savedState);
+showScreen(coverScreen);
+
+document.getElementById('play-btn').onclick = () => {
+  showScreen(gameScreen);
+  launchGame(savedState);
+};
+
+document.getElementById('cover-reset-btn').onclick = () => {
+  if (!window.confirm('Xóa toàn bộ tiến trình hiện tại và bắt đầu ván mới?')) return;
+  clearState();
+  window.location.reload();
+};

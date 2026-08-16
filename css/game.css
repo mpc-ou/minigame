@@ -15,18 +15,28 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 14px;
   text-align: center;
 }
 
+/* Font 'VT323' co day du bo dau tieng Viet (khac voi 'Press Start 2P' truoc
+   day thieu subset Vietnamese, gay loi hien thi cac ky tu co dau) */
 .game-title {
-  font-family: 'Press Start 2P', 'Montserrat', sans-serif;
+  font-family: 'VT323', 'Montserrat', sans-serif;
   color: var(--accent);
-  font-size: 13px;
-  line-height: 1.6;
-  letter-spacing: 1px;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: 2px;
   text-shadow: var(--glow-orange);
+}
+
+.game-subtitle {
+  font-family: 'VT323', 'Montserrat', sans-serif;
+  color: var(--accent-cyan);
+  font-size: 18px;
+  letter-spacing: 3px;
+  text-shadow: var(--glow-cyan);
 }
 
 .progress-badge {
