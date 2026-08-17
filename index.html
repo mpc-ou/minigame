@@ -123,7 +123,7 @@
             </p>
           </div>
           <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
-            <span class="text-xs text-gray-400">Tác giả: ${game.author || 'MPC'}</span>
+            <span class="text-xs text-gray-500">Tác giả: ${game.github ? `<a href="https://github.com/${game.github}" target="_blank" rel="noopener" class="font-medium text-gray-700 hover:text-blue-600 underline">${game.author}</a>` : (game.author || 'MPC')}</span>
             <a href="${game.path}" class="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-blue-600 transition">
               Chơi ngay &rarr;
             </a>
