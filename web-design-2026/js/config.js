@@ -26,4 +26,4 @@ export const HINT_MASK_MAX_RATIO = 0.5;
 
 export const HINT_URGENT_THRESHOLD_S = 5;
 
-export const GGFORM_URL = 'https://konnn04.dev';
+export const GGFORM_URL = 'https://www.mpclub.dev';
