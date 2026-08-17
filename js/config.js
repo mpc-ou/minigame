@@ -28,3 +28,11 @@ export const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export const HINT_INTERVAL_MS = 30000;
 export const HINT_MASK_MIN_RATIO = 0.4;
 export const HINT_MASK_MAX_RATIO = 0.5;
+
+// Duoi bao nhieu giay con lai thi doi mascot sang bieu cam "sot ruot" de
+// nguoi choi de y dem nguoc, thay vi goi y roi ra am tham khong bao truoc
+export const HINT_URGENT_THRESHOLD_S = 5;
+
+// Link Google Form de nop minh chung (VD sau khi xuat anh xong). De trong
+// ('') neu chua co form - giao dien se tu an goi y "Nop minh chung" di.
+export const GGFORM_URL = '';

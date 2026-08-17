@@ -66,7 +66,9 @@ function buildFileName(state) {
 // Render anh PNG bang html2canvas roi tai truc tiep ve may (khong mo tab moi,
 // khong dung Web Share API). Tra ve true neu thanh cong, false neu loi.
 export async function exportResultImage(state, grid, placements, exportBtn) {
-  const originalText = exportBtn ? exportBtn.textContent : '';
+  // Luu lai innerHTML (khong chi textContent) de khoi phuc dung ca icon
+  // FontAwesome ben trong nut sau khi xuat xong
+  const originalHTML = exportBtn ? exportBtn.innerHTML : '';
   if (exportBtn) {
     exportBtn.disabled = true;
     exportBtn.textContent = 'Đang tạo ảnh...';
@@ -107,7 +109,7 @@ export async function exportResultImage(state, grid, placements, exportBtn) {
     if (card) card.remove();
     if (exportBtn) {
       exportBtn.disabled = false;
-      exportBtn.textContent = originalText;
+      exportBtn.innerHTML = originalHTML;
     }
   }
 }

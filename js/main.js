@@ -2,10 +2,12 @@
 import { loadState, saveState, clearState, createInitialState } from './storage.js';
 import { startNewMatrix, createGame } from './game.js';
 import { KEYWORDS } from './config.js';
+import { showDialog, hideDialog } from './animation.js';
 
 const coverScreen = document.getElementById('cover-screen');
 const gameScreen = document.getElementById('game-screen');
 const coverStatusEl = document.getElementById('cover-status');
+const guideDialogEl = document.getElementById('guide-dialog');
 
 const infoForm = document.getElementById('info-form');
 const infoFullNameInput = infoForm.querySelector('#full-name');
@@ -26,9 +28,13 @@ const dom = {
   postWinStatusEl: document.getElementById('post-win-status'),
   saveProofBtn: document.getElementById('save-proof-btn'),
   exportActionBtn: document.getElementById('export-action-btn'),
+  ggformLinkEl: document.getElementById('ggform-link'),
   infoDialogEl: document.getElementById('info-dialog'),
   infoFormEl: infoForm,
   infoFormErrorEl: document.getElementById('form-error'),
+  hintWidgetEl: document.getElementById('hint-widget'),
+  hintMascotEl: document.getElementById('hint-mascot'),
+  hintCountdownEl: document.getElementById('hint-countdown'),
 };
 
 function launchGame(state) {
@@ -103,3 +109,8 @@ document.getElementById('cover-reset-btn').onclick = () => {
   clearState();
   window.location.reload();
 };
+
+// Modal Huong dan dung chung cho ca man hinh bia va man hinh choi
+document.getElementById('info-btn-cover').onclick = () => showDialog(guideDialogEl);
+document.getElementById('info-btn-game').onclick = () => showDialog(guideDialogEl);
+document.getElementById('close-guide-btn').onclick = () => hideDialog(guideDialogEl);

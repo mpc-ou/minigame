@@ -10,7 +10,7 @@
   --accent-cyan: #00eaff;
   --accent-purple: #b026ff;
   --text-primary: #f0f0f7;
-  --text-secondary: #9090b0;
+  --text-secondary: #b0b0d6;
   --success: #2effa0;
   --success-bg: #123322;
   --danger: #ff3860;
@@ -28,15 +28,31 @@
   padding: 0;
 }
 
+/* Nen "glowing grid canvas": luoi ke moc sang nhe troi cham theo duong cheo,
+   ket hop 2 quang sang cyan/tim o goc, tao chieu sau kieu cyber thay vi mang
+   den phang lang. Tat animation neu nguoi dung bat prefers-reduced-motion. */
 body {
   font-family: 'Montserrat', 'Segoe UI', sans-serif;
-  background:
-    radial-gradient(circle at 15% 0%, rgba(0, 234, 255, 0.07), transparent 42%),
-    radial-gradient(circle at 85% 100%, rgba(176, 38, 255, 0.08), transparent 45%),
-    var(--bg-main);
+  background-color: var(--bg-main);
+  background-image:
+    linear-gradient(rgba(0, 234, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 234, 255, 0.07) 1px, transparent 1px),
+    radial-gradient(circle at 15% 0%, rgba(0, 234, 255, 0.09), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(176, 38, 255, 0.1), transparent 45%);
+  background-size: 42px 42px, 42px 42px, auto, auto;
+  animation: grid-drift 8s linear infinite;
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes grid-drift {
+  0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 42px 42px, 42px 42px, 0 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { animation: none; }
 }
 
 .screen {

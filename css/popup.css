@@ -33,9 +33,12 @@
   transform: scale(1);
 }
 
-.dialog-trophy {
-  font-size: 40px;
-  margin-bottom: 12px;
+.dialog-mascot {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin: 0 auto 8px;
+  display: block;
 }
 
 .dialog-title {
@@ -49,7 +52,8 @@
 }
 
 .dialog-text {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--text-secondary);
   margin-bottom: 24px;
 }
@@ -61,12 +65,17 @@
 }
 
 .btn-export {
-  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
   background: var(--accent);
   color: var(--accent-dark);
   font-weight: 700;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 15px;
   box-shadow: var(--glow-orange);
 }
 
@@ -80,8 +89,50 @@
   background: transparent;
   border: 0.5px solid var(--border-color);
   color: var(--text-secondary);
+  font-weight: 500;
   border-radius: 10px;
   font-size: 14px;
+}
+
+/* GUIDE DIALOG - noi dung dai hon dialog thuong, can scroll rieng va can trai */
+.guide-box {
+  max-width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.guide-content {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.guide-content h3 {
+  font-family: 'VT323', 'Montserrat', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--accent-cyan);
+  text-shadow: var(--glow-cyan);
+  margin: 16px 0 8px;
+}
+
+.guide-content h3:first-child {
+  margin-top: 0;
+}
+
+.guide-content ol {
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.guide-content li {
+  margin-bottom: 8px;
+}
+
+.guide-content strong {
+  color: var(--text-primary);
 }
 
 /* Capture card - dung khi xuat anh, luon dat ngoai man hinh

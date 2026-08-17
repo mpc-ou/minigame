@@ -1,5 +1,5 @@
 // game.js - "Nhac truong": giu state, goi cac module khac
-import { GRID_SIZE, KEYWORDS, HINT_INTERVAL_MS } from './config.js';
+import { GRID_SIZE, KEYWORDS, HINT_INTERVAL_MS, HINT_URGENT_THRESHOLD_S, GGFORM_URL } from './config.js';
 import { generateMatrix } from './matrix.js';
 import { createSelectionManager } from './selection.js';
 import { checkMatch } from './validator.js';
@@ -23,6 +23,7 @@ export function createGame({ dom, state }) {
   // luu vao localStorage, chi ton tai trong phien choi hien tai.
   const hintedWords = {};
   let hintTimerId = null;
+  let nextHintAt = null; // moc thoi gian (Date.now()) cua lan goi y tiep theo
 
   // O co the la diem giao nhau cua nhieu tu (VD: chu L cuoi cua HTML trung
   // chu L dau cua LAYOUT). Chi coi la "het viec" khi TAT CA cac tu di qua
@@ -96,19 +97,40 @@ export function createGame({ dom, state }) {
   // Cu HINT_INTERVAL_MS troi qua ma con tu chua tim duoc thi tu dong che
   // bot ky tu 1 tu ngau nhien de goi y. Uu tien tu chua tung duoc goi y de
   // moi lan hen gio deu mang lai thong tin moi cho nguoi choi.
+  //
+  // Chay tick moi giay de hien dem nguoc + doi bieu cam linh vat (binh
+  // thuong -> sot ruot khi gan den luc goi y), de nguoi choi biet truoc
+  // sap co goi y thay vi bi bat ngo (va do phai chup man hinh cho AI).
   function startHintTimer() {
-    hintTimerId = setInterval(() => {
-      const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
-      if (unfound.length === 0) {
-        stopHintTimer();
-        return;
-      }
+    nextHintAt = Date.now() + HINT_INTERVAL_MS;
+    dom.hintWidgetEl.classList.remove('hidden');
+    tickHintCountdown();
+    hintTimerId = setInterval(tickHintCountdown, 1000);
+  }
+
+  function tickHintCountdown() {
+    const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
+    if (unfound.length === 0) {
+      stopHintTimer();
+      return;
+    }
+
+    const remainingMs = nextHintAt - Date.now();
+    if (remainingMs <= 0) {
       const notYetHinted = unfound.filter((w) => !hintedWords[w]);
       const pool = notYetHinted.length > 0 ? notYetHinted : unfound;
       const word = pool[randomInt(pool.length)];
       hintedWords[word] = maskWord(word);
       renderKeywordList();
-    }, HINT_INTERVAL_MS);
+      nextHintAt = Date.now() + HINT_INTERVAL_MS;
+    }
+
+    const remainingS = Math.max(0, Math.ceil((nextHintAt - Date.now()) / 1000));
+    dom.hintMascotEl.src =
+      remainingS <= HINT_URGENT_THRESHOLD_S
+        ? 'assets/mascot/mascot-cry.png'
+        : 'assets/mascot/mascot-shy.png';
+    dom.hintCountdownEl.textContent = `Gợi ý tiếp theo sau: ${remainingS}s`;
   }
 
   function stopHintTimer() {
@@ -116,6 +138,7 @@ export function createGame({ dom, state }) {
       clearInterval(hintTimerId);
       hintTimerId = null;
     }
+    dom.hintWidgetEl.classList.add('hidden');
   }
 
   function renderProgress() {
@@ -137,7 +160,8 @@ export function createGame({ dom, state }) {
   }
 
   // Panel hien sau khi thang, noi dung thay doi theo tung buoc trong luong:
-  // chua nhap ten/MSSV -> da nhap nhung chua xuat anh -> da xuat xong
+  // chua nhap ten/MSSV -> da nhap nhung chua xuat anh -> da xuat (van cho
+  // xuat lai neu lo lam mat anh, chi rieng ten/MSSV la khong sua duoc nua)
   function renderPostWinPanel() {
     if (!isReadOnly) {
       dom.postWinPanelEl.classList.add('hidden');
@@ -146,15 +170,25 @@ export function createGame({ dom, state }) {
     dom.postWinPanelEl.classList.remove('hidden');
     dom.saveProofBtn.classList.add('hidden');
     dom.exportActionBtn.classList.add('hidden');
+    dom.ggformLinkEl.classList.add('hidden');
 
     if (!infoSubmitted) {
       dom.postWinStatusEl.textContent = 'Bạn đã hoàn thành thử thách! Lưu minh chứng để xuất ảnh kết quả.';
       dom.saveProofBtn.classList.remove('hidden');
-    } else if (!exported) {
-      dom.postWinStatusEl.textContent = `Người chơi: ${state.fullName} — MSSV: ${state.studentId}`;
-      dom.exportActionBtn.classList.remove('hidden');
-    } else {
-      dom.postWinStatusEl.textContent = `Đã xuất minh chứng cho ${state.fullName} — MSSV: ${state.studentId} ✓`;
+      return;
+    }
+
+    dom.postWinStatusEl.textContent = exported
+      ? `Đã xuất minh chứng cho ${state.fullName} — MSSV: ${state.studentId} ✓ (bấm lại nếu lỡ mất ảnh)`
+      : `Người chơi: ${state.fullName} — MSSV: ${state.studentId}`;
+    dom.exportActionBtn.classList.remove('hidden');
+    dom.exportActionBtn.innerHTML = exported
+      ? '<i class="fa-solid fa-download"></i> Xuất ảnh lại'
+      : '<i class="fa-solid fa-download"></i> Xuất ảnh';
+
+    if (exported && GGFORM_URL) {
+      dom.ggformLinkEl.href = GGFORM_URL;
+      dom.ggformLinkEl.classList.remove('hidden');
     }
   }
 
