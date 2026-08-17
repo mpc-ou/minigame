@@ -1,11 +1,7 @@
-/* animation.css - Toan bo @keyframes tach rieng */
-
 .confetti-canvas {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  /* Thap hon .dialog-overlay (z-index:100) de phao hoa khong de len va
-     lam roi noi dung Victory Dialog dang hien cung luc */
   z-index: 90;
 }
 
@@ -21,8 +17,13 @@
 }
 
 @keyframes glow {
-  0% { box-shadow: 0 0 0 0 rgba(255, 122, 26, 0.6); }
-  100% { box-shadow: 0 0 0 4px rgba(255, 122, 26, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 122, 26, 0.6);
+  }
+
+  100% {
+    box-shadow: 0 0 0 4px rgba(255, 122, 26, 0);
+  }
 }
 
 .cell-pulse {
@@ -30,10 +31,23 @@
 }
 
 @keyframes sweep {
-  0% { transform: scale(1); background: var(--accent) !important; }
-  45% { transform: scale(1.25); }
-  70% { transform: scale(0.92); }
-  100% { transform: scale(1); background: var(--success-bg) !important; }
+  0% {
+    transform: scale(1);
+    background: var(--accent) !important;
+  }
+
+  45% {
+    transform: scale(1.25);
+  }
+
+  70% {
+    transform: scale(0.92);
+  }
+
+  100% {
+    transform: scale(1);
+    background: var(--success-bg) !important;
+  }
 }
 
 .cell-invalid {
@@ -41,9 +55,19 @@
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  75% { transform: translateX(3px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-3px);
+  }
+
+  75% {
+    transform: translateX(3px);
+  }
 }
 
 .btn-primary:active,
@@ -53,6 +77,11 @@
 }
 
 @keyframes ripple {
-  0% { opacity: 0.7; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }

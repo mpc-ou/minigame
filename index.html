@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MPC Minigames Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 bg-gray-900 text-white rounded-lg flex items-center justify-center font-bold text-lg">
+          M
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-gray-900 leading-none">MPC Minigames</h1>
+          <p class="text-xs text-gray-500 mt-0.5">Tổng hợp minigame MPC Web</p>
+        </div>
+      </div>
+      <a href="https://github.com/CLB-Lap-Trinh-Tren-Thiet-Bi-Di-Dong" target="_blank" rel="noopener" class="text-xs text-gray-600 hover:text-gray-900 font-medium">
+        CLB Lập Trình Trên Thiết Bị Di Động &rarr;
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full">
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-gray-900">Danh sách Minigame</h2>
+        <p class="text-sm text-gray-500">Chọn một minigame bên dưới để bắt đầu trải nghiệm</p>
+      </div>
+      <div>
+        <input 
+          id="search-input" 
+          type="text" 
+          placeholder="Tìm kiếm minigame..." 
+          class="w-full sm:w-64 px-3 py-2 text-sm bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+        />
+      </div>
+    </div>
+
+    <!-- Games Container -->
+    <div id="games-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Fallback static card while loading data.json -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div class="flex items-center gap-3">
+              <img src="web-design-2026/assets/logo/logo.png" alt="Logo" class="w-10 h-10 rounded-md object-contain border border-gray-100" />
+              <div>
+                <h3 class="text-base font-bold text-gray-900 leading-snug">Word Hunt Game</h3>
+                <p class="text-xs text-gray-500 font-medium">WEB-DESIGN 2026</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+              Web Design
+            </span>
+          </div>
+          <p class="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">
+            Minigame tìm từ khóa ẩn trong ma trận chữ, thử thách chính thức của cuộc thi WEB-DESIGN 2026.
+          </p>
+        </div>
+        <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+          <span class="text-xs text-gray-400">Tác giả: MPC Team</span>
+          <a href="./web-design-2026/" class="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-blue-600 transition">
+            Chơi ngay &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
+    <div class="max-w-4xl mx-auto px-4 text-center text-xs text-gray-400">
+      &copy; 2026 CLB Lập Trình Trên Thiết Bị Di Động - MPC Web. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    let gamesData = [];
+
+    async function loadGames() {
+      try {
+        const res = await fetch('./data.json');
+        if (res.ok) {
+          gamesData = await res.json();
+          renderGames(gamesData);
+        }
+      } catch (err) {
+        console.warn('Could not fetch data.json, using static fallback:', err);
+      }
+    }
+
+    function renderGames(games) {
+      const container = document.getElementById('games-list');
+      if (!games || games.length === 0) {
+        container.innerHTML = '<p class="col-span-2 text-sm text-gray-500 py-8 text-center">Không tìm thấy minigame nào.</p>';
+        return;
+      }
+
+      container.innerHTML = games.map(game => `
+        <div class="bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="flex items-center gap-3">
+                <img src="${game.icon || 'web-design-2026/assets/logo/logo.png'}" alt="${game.name}" class="w-10 h-10 rounded-md object-contain border border-gray-100" />
+                <div>
+                  <h3 class="text-base font-bold text-gray-900 leading-snug">${game.name}</h3>
+                  <p class="text-xs text-gray-500 font-medium">${game.competition || ''}</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                ${game.topic ? game.topic.replace('Chủ đề: ', '') : 'Game'}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">
+              ${game.description || ''}
+            </p>
+          </div>
+          <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+            <span class="text-xs text-gray-400">Tác giả: ${game.author || 'MPC'}</span>
+            <a href="${game.path}" class="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-blue-600 transition">
+              Chơi ngay &rarr;
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('search-input')?.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!gamesData || gamesData.length === 0) return;
+      const filtered = gamesData.filter(g => 
+        (g.name && g.name.toLowerCase().includes(q)) ||
+        (g.competition && g.competition.toLowerCase().includes(q)) ||
+        (g.topic && g.topic.toLowerCase().includes(q)) ||
+        (g.description && g.description.toLowerCase().includes(q))
+      );
+      renderGames(filtered);
+    });
+
+    loadGames();
+  </script>
+</body>
+</html>

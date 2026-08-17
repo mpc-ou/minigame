@@ -4,77 +4,75 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Word Search Game - WEB-DESIGN 2026</title>
+    <title>Word Hunt Game - WEB-DESIGN 2026</title>
     <meta name="description"
-        content="Word Search Game - minigame tìm từ khóa ẩn trong ma trận chữ, thử thách chính thức của cuộc thi WEB-DESIGN 2026 do CLB Lập Trình Trên Thiết Bị Di Động tổ chức." />
-    <meta name="keywords" content="word search game, web design 2026, minigame tìm từ, clb lập trình di động" />
+        content="Word Hunt Game - minigame tìm từ khóa ẩn trong ma trận chữ, thử thách chính thức của cuộc thi WEB-DESIGN 2026 do CLB Lập Trình Trên Thiết Bị Di Động tổ chức." />
+    <meta name="keywords" content="Word Hunt Game, web design 2026, minigame tìm từ, clb lập trình di động" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Word Search Game - WEB-DESIGN 2026" />
-    <meta property="og:description" content="Minigame tìm từ khóa ẩn trong ma trận chữ - thử thách của cuộc thi WEB-DESIGN 2026." />
+    <meta property="og:title" content="Word Hunt Game - WEB-DESIGN 2026" />
+    <meta property="og:description"
+        content="Minigame tìm từ khóa ẩn trong ma trận chữ - thử thách của cuộc thi WEB-DESIGN 2026." />
     <meta property="og:image" content="assets/logo/logo.png" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Word Search Game - WEB-DESIGN 2026" />
-    <meta name="twitter:description" content="Minigame tìm từ khóa ẩn trong ma trận chữ - thử thách của cuộc thi WEB-DESIGN 2026." />
+    <meta name="twitter:title" content="Word Hunt Game - WEB-DESIGN 2026" />
+    <meta name="twitter:description"
+        content="Minigame tìm từ khóa ẩn trong ma trận chữ - thử thách của cuộc thi WEB-DESIGN 2026." />
     <meta name="twitter:image" content="assets/logo/logo.png" />
-    <link rel="icon" type="image/png" href="assets/logo/logo.png" />
+    <link rel="icon" type="image/png" href="./assets/logo/logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=VT323&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=VT323&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/welcome.css" />
-    <link rel="stylesheet" href="css/game.css" />
-    <link rel="stylesheet" href="css/popup.css" />
-    <link rel="stylesheet" href="css/animation.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/welcome.css" />
+    <link rel="stylesheet" href="./css/game.css" />
+    <link rel="stylesheet" href="./css/popup.css" />
+    <link rel="stylesheet" href="./css/animation.css" />
 </head>
 
 <body>
 
-    <!-- MAN HINH BIA - hien dau tien, bam Choi moi vao man choi chinh -->
     <section id="cover-screen" class="screen active">
         <div class="cover-card">
+            <button id="sound-btn-cover" class="btn-sound" aria-label="Bật/Tắt âm thanh">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
             <button id="info-btn-cover" class="btn-info" aria-label="Hướng dẫn">
                 <i class="fa-solid fa-circle-info"></i>
             </button>
-            <img src="assets/logo/logo.png" alt="Logo CLB Lập Trình Trên Thiết Bị Di Động" class="cover-logo" />
-            <p class="game-title">WORD SEARCH GAME</p>
+            <img src="./assets/logo/logo.png" alt="Logo CLB Lập Trình Trên Thiết Bị Di Động" class="cover-logo" />
+            <p class="game-title">Word Hunt Game</p>
             <p class="game-subtitle">WEB-DESIGN 2026</p>
-            <img src="assets/mascot/mascot-idle.png" alt="Linh vật cáo của CLB" class="cover-mascot" />
+            <p class="game-topic" id="cover-topic">Chủ đề: Lập trình &amp; Thiết kế Web</p>
+            <img src="./assets/mascot/mascot-idle.png" alt="Linh vật cáo của CLB" class="cover-mascot" />
             <p class="cover-status" id="cover-status"></p>
             <button id="play-btn" class="btn-primary">Chơi</button>
             <button id="cover-reset-btn" class="btn-reset">Xóa kết quả</button>
         </div>
     </section>
 
-    <!-- MAN HINH CHOI - chi vao sau khi bam Choi o man hinh bia -->
     <section id="game-screen" class="screen">
         <div class="game-container">
+            <button id="sound-btn-game" class="btn-sound" aria-label="Bật/Tắt âm thanh">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
             <button id="info-btn-game" class="btn-info" aria-label="Hướng dẫn">
                 <i class="fa-solid fa-circle-info"></i>
             </button>
             <div class="game-header">
-                <p class="game-title">WORD SEARCH GAME</p>
+                <p class="game-title">Word Hunt Game</p>
                 <p class="game-subtitle">WEB-DESIGN 2026</p>
+                <p class="game-topic" id="game-topic">Chủ đề: Lập trình &amp; Thiết kế Web</p>
                 <div class="progress-badge" id="progress">0/5</div>
             </div>
 
             <div class="keyword-list" id="keyword-list"></div>
-
-            <!-- Bao truoc bang dem nguoc + linh vat, de nguoi choi biet gan
-                 den luc duoc goi y, khong bi bat ngo -->
-            <div id="hint-widget" class="hint-widget hidden">
-                <img id="hint-mascot" src="assets/mascot/mascot-shy.png" alt="Linh vật cáo" class="hint-mascot" />
-                <p class="hint-countdown" id="hint-countdown"></p>
-            </div>
 
             <div class="grid-wrapper">
                 <div class="grid" id="grid"></div>
             </div>
             <p class="hint-text">Tap từng ô để chọn từ khóa</p>
 
-            <!-- Panel hien sau khi thang, thay doi theo tung buoc: luu minh
-                 chung -> xuat anh -> da xuat/co the xuat lai -->
             <div id="post-win-panel" class="post-win-panel hidden">
                 <p class="post-win-status" id="post-win-status"></p>
                 <button id="save-proof-btn" class="btn-primary hidden">Lưu minh chứng</button>
@@ -90,10 +88,23 @@
         </div>
     </section>
 
-    <!-- Canvas phao hoa, chi ve khi thang, tu dong tat sau vai giay -->
+    <!-- Floating Mascot Hint Popup in bottom-right -->
+    <div id="mascot-hint-popup" class="mascot-hint-popup hidden" title="Gợi ý từ khóa">
+        <div id="hint-cloud" class="hint-cloud">
+            <span id="hint-cloud-text" class="hint-cloud-text">30s</span>
+        </div>
+        <img id="hint-mascot" src="./assets/mascot/mascot-idle.png" alt="Linh vật cáo" class="hint-mascot-img" />
+    </div>
+
+    <!-- 3-2-1 GO Countdown Overlay -->
+    <div id="countdown-overlay" class="countdown-overlay hidden">
+        <div class="countdown-card">
+            <div id="countdown-number" class="countdown-number">3</div>
+        </div>
+    </div>
+
     <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
 
-    <!-- VICTORY DIALOG - chi la thong bao chuc mung, khong con nut xuat anh -->
     <div id="victory-dialog" class="dialog-overlay hidden">
         <div class="dialog-box">
             <img src="assets/mascot/mascot-cheer.png" alt="Linh vật cáo ăn mừng" class="dialog-mascot" />
@@ -105,9 +116,21 @@
         </div>
     </div>
 
-    <!-- GUIDE DIALOG - huong dan choi + nop DRL, mo tu icon (i) o ca 2 man hinh -->
+    <!-- Custom Alert / Confirm Modal Dialog -->
+    <div id="custom-modal" class="dialog-overlay hidden">
+        <div class="dialog-box modal-box">
+            <img id="custom-modal-mascot" src="assets/mascot/mascot-idle.png" alt="Linh vật" class="dialog-mascot" />
+            <p id="custom-modal-title" class="dialog-title">Thông báo</p>
+            <p id="custom-modal-text" class="dialog-text">Nội dung thông báo</p>
+            <div id="custom-modal-actions" class="dialog-actions modal-actions"></div>
+        </div>
+    </div>
+
     <div id="guide-dialog" class="dialog-overlay hidden">
         <div class="dialog-box guide-box">
+            <button id="close-guide-btn" class="dialog-close-icon" aria-label="Đóng">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
             <p class="dialog-title">Hướng dẫn</p>
             <div class="guide-content">
                 <h3>Cách chơi</h3>
@@ -131,13 +154,9 @@
                         luyện (DRL).</li>
                 </ol>
             </div>
-            <div class="dialog-actions">
-                <button id="close-guide-btn" class="btn-close">Đóng</button>
-            </div>
         </div>
     </div>
 
-    <!-- INFO DIALOG - nhap ho ten + MSSV, chi hien khi bam "Luu minh chung" -->
     <div id="info-dialog" class="dialog-overlay hidden">
         <div class="dialog-box">
             <p class="dialog-title">Lưu minh chứng</p>
@@ -161,7 +180,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="./js/main.js"></script>
 </body>
 
 </html>

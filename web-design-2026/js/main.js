@@ -1,8 +1,9 @@
-// main.js - Entry point duy nhat
 import { loadState, saveState, clearState, createInitialState } from './storage.js';
 import { startNewMatrix, createGame } from './game.js';
-import { KEYWORDS } from './config.js';
+import { KEYWORDS, TOPIC } from './config.js';
 import { showDialog, hideDialog } from './animation.js';
+import { isSoundEnabled, toggleSound, playCountdownBeep } from './audio.js';
+import { showModalConfirm } from './modal.js';
 
 const coverScreen = document.getElementById('cover-screen');
 const gameScreen = document.getElementById('game-screen');
@@ -32,34 +33,93 @@ const dom = {
   infoDialogEl: document.getElementById('info-dialog'),
   infoFormEl: infoForm,
   infoFormErrorEl: document.getElementById('form-error'),
-  hintWidgetEl: document.getElementById('hint-widget'),
+  coverTopicEl: document.getElementById('cover-topic'),
+  gameTopicEl: document.getElementById('game-topic'),
+  mascotHintPopupEl: document.getElementById('mascot-hint-popup'),
+  hintCloudEl: document.getElementById('hint-cloud'),
+  hintCloudTextEl: document.getElementById('hint-cloud-text'),
   hintMascotEl: document.getElementById('hint-mascot'),
-  hintCountdownEl: document.getElementById('hint-countdown'),
+  countdownOverlayEl: document.getElementById('countdown-overlay'),
+  countdownNumberEl: document.getElementById('countdown-number'),
+  soundBtnCover: document.getElementById('sound-btn-cover'),
+  soundBtnGame: document.getElementById('sound-btn-game'),
 };
 
-function launchGame(state) {
-  const game = createGame({ dom, state });
-
-  // Gan nut "Xoa ket qua / Choi lai" TRUOC khi goi init(): day la loi thoat
-  // du phong, phai luon hoat dong ke ca khi init() gap loi khi khoi phuc 1
-  // state cu/hong (vi du du lieu localStorage tu 1 phien ban truoc)
-  document.getElementById('reset-btn').onclick = () => game.handleReset();
-
-  game.init();
-
-  document.getElementById('close-victory-btn').onclick = () => game.closeVictoryDialog();
-  dom.saveProofBtn.onclick = () => game.openInfoDialog();
-  dom.exportActionBtn.onclick = () => game.handleExportAction();
-
-  infoForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    game.handleInfoSubmit(infoFullNameInput.value.trim(), infoStudentIdInput.value.trim());
-  });
+function updateSoundButtons(enabled) {
+  const iconHtml = enabled
+    ? '<i class="fa-solid fa-volume-high"></i>'
+    : '<i class="fa-solid fa-volume-xmark"></i>';
+  if (dom.soundBtnCover) dom.soundBtnCover.innerHTML = iconHtml;
+  if (dom.soundBtnGame) dom.soundBtnGame.innerHTML = iconHtml;
 }
 
-// Doi pho voi du lieu cu/khong khop schema hien tai (VD: luu tu 1 phien ban
-// truoc do cua trang, hoac bi sua tay) - neu khong day du thi coi nhu chua
-// co gi, tranh render nua voi hoac nem loi giua chung khi khoi phuc.
+function setupSoundToggle() {
+  updateSoundButtons(isSoundEnabled());
+  const onToggle = () => {
+    const enabled = toggleSound();
+    updateSoundButtons(enabled);
+  };
+  if (dom.soundBtnCover) dom.soundBtnCover.onclick = onToggle;
+  if (dom.soundBtnGame) dom.soundBtnGame.onclick = onToggle;
+}
+
+let gameInstance = null;
+
+function launchGame(state) {
+  if (!gameInstance) {
+    gameInstance = createGame({ dom, state });
+    document.getElementById('reset-btn').onclick = () => gameInstance.handleReset();
+    document.getElementById('close-victory-btn').onclick = () => gameInstance.closeVictoryDialog();
+    dom.saveProofBtn.onclick = () => gameInstance.openInfoDialog();
+    dom.exportActionBtn.onclick = () => gameInstance.handleExportAction();
+
+    infoForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      gameInstance.handleInfoSubmit(infoFullNameInput.value.trim(), infoStudentIdInput.value.trim());
+    });
+  }
+
+  gameInstance.init();
+}
+
+function runStartCountdown(onComplete) {
+  const overlay = dom.countdownOverlayEl;
+  const numEl = dom.countdownNumberEl;
+  overlay.classList.remove('hidden');
+
+  function setStep(text, isGo) {
+    numEl.classList.remove('go');
+    numEl.style.animation = 'none';
+    void numEl.offsetWidth; // trigger reflow
+    numEl.textContent = text;
+    if (isGo) numEl.classList.add('go');
+    numEl.style.animation = 'countdown-pop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  }
+
+  setStep('3', false);
+  playCountdownBeep(3);
+
+  setTimeout(() => {
+    setStep('2', false);
+    playCountdownBeep(2);
+  }, 850);
+
+  setTimeout(() => {
+    setStep('1', false);
+    playCountdownBeep(1);
+  }, 1700);
+
+  setTimeout(() => {
+    setStep('GO!', true);
+    playCountdownBeep('GO');
+  }, 2550);
+
+  setTimeout(() => {
+    overlay.classList.add('hidden');
+    onComplete();
+  }, 3200);
+}
+
 function isValidSavedState(saved) {
   return (
     !!saved &&
@@ -75,8 +135,6 @@ function bootstrap() {
   let saved = loadState();
 
   if (!isValidSavedState(saved)) {
-    // Chua co van choi nao (hoac du lieu cu khong khop) -> sinh ma tran ngau
-    // nhien san, cho den khi bam Choi o man hinh bia moi thuc su vao choi
     const { grid, placements } = startNewMatrix();
     saved = { ...createInitialState(), grid, placements };
     saveState(saved);
@@ -86,6 +144,7 @@ function bootstrap() {
 }
 
 function renderCoverStatus(saved) {
+  if (dom.coverTopicEl) dom.coverTopicEl.textContent = TOPIC;
   if (saved.isWin) {
     coverStatusEl.textContent = 'Bạn đã hoàn thành ván trước - bấm Chơi để xem lại kết quả.';
   } else if (saved.foundKeywords.length > 0) {
@@ -96,21 +155,41 @@ function renderCoverStatus(saved) {
 }
 
 const savedState = bootstrap();
+setupSoundToggle();
 renderCoverStatus(savedState);
 showScreen(coverScreen);
 
+let isStarting = false;
 document.getElementById('play-btn').onclick = () => {
-  showScreen(gameScreen);
-  launchGame(savedState);
+  if (isStarting) return;
+
+  if (savedState.isWin) {
+    showScreen(gameScreen);
+    launchGame(savedState);
+  } else {
+    isStarting = true;
+    runStartCountdown(() => {
+      isStarting = false;
+      showScreen(gameScreen);
+      launchGame(savedState);
+    });
+  }
 };
 
-document.getElementById('cover-reset-btn').onclick = () => {
-  if (!window.confirm('Xóa toàn bộ tiến trình hiện tại và bắt đầu ván mới?')) return;
+document.getElementById('cover-reset-btn').onclick = async () => {
+  const confirmed = await showModalConfirm({
+    title: 'Bắt đầu ván mới?',
+    message: 'Hành động này sẽ xóa toàn bộ tiến trình hiện tại và tạo một ma trận mới.',
+    confirmText: 'Xóa & Bắt đầu lại',
+    cancelText: 'Quay lại',
+    danger: true,
+    mascot: 'assets/mascot/mascot-cry.png',
+  });
+  if (!confirmed) return;
   clearState();
   window.location.reload();
 };
 
-// Modal Huong dan dung chung cho ca man hinh bia va man hinh choi
 document.getElementById('info-btn-cover').onclick = () => showDialog(guideDialogEl);
 document.getElementById('info-btn-game').onclick = () => showDialog(guideDialogEl);
 document.getElementById('close-guide-btn').onclick = () => hideDialog(guideDialogEl);

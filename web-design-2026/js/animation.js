@@ -1,5 +1,3 @@
-// animation.js - Chi lo them/xoa class, khong chua logic game (dumb component)
-
 export function markSelecting(el) {
   el.classList.add('cell-selecting');
 }
@@ -22,7 +20,6 @@ export function shakeInvalid(elements) {
   });
 }
 
-// Dung chung cho moi dialog-overlay (victory, nhap thong tin...)
 export function showDialog(dialogEl, vibrate = false) {
   dialogEl.classList.remove('hidden');
   requestAnimationFrame(() => dialogEl.classList.add('show'));
@@ -34,8 +31,6 @@ export function hideDialog(dialogEl) {
   setTimeout(() => dialogEl.classList.add('hidden'), 250);
 }
 
-// Phao hoa mung chien thang - canvas thuan, khong dung thu vien ngoai.
-// Ve vai "qua phao hoa" no lech nhau tren canvas roi tu tat sau ~2.5s.
 const CONFETTI_COLORS = ['#ff7a1a', '#00eaff', '#b026ff', '#2effa0', '#ffffff'];
 const CONFETTI_DURATION_MS = 2500;
 const CONFETTI_PARTICLES_PER_BURST = 40;
@@ -72,7 +67,6 @@ export function launchConfetti(canvasEl) {
   canvasEl.style.height = `${h}px`;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  // Cac dot no lech thoi gian de tao cam giac phao hoa lien tuc
   const bursts = [
     { x: w * 0.3, y: h * 0.35, delay: 0 },
     { x: w * 0.7, y: h * 0.3, delay: 250 },
@@ -91,7 +85,7 @@ export function launchConfetti(canvasEl) {
   function frame(now) {
     ctx.clearRect(0, 0, w, h);
     particles.forEach((p) => {
-      p.vy += 0.05; // trong luc
+      p.vy += 0.05;
       p.x += p.vx;
       p.y += p.vy;
       p.life -= 1;

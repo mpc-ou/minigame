@@ -1,6 +1,6 @@
-// capture.js - Dung html2canvas de xuat anh ket qua
 import { GAME_NAME, COMPETITION_NAME, KEYWORDS, GRID_SIZE } from './config.js';
 import { formatDateTime, generateHash } from './utils.js';
+import { showModalAlert } from './modal.js';
 
 function buildCaptureCard(state, grid, placements) {
   const card = document.createElement('div');
@@ -11,7 +11,6 @@ function buildCaptureCard(state, grid, placements) {
   const winTimeStr = formatDateTime(new Date(state.winTime));
   const hash = generateHash(`${state.fullName}|${state.studentId}|${state.winTime}`);
 
-  // Tao tap hop toa do cac o dung de highlight xanh
   const correctSet = new Set();
   Object.values(placements).forEach((cells) => {
     cells.forEach((cell) => correctSet.add(`${cell.r}_${cell.c}`));
@@ -63,11 +62,7 @@ function buildFileName(state) {
   return `Minigame-${namePart}-${state.studentId}.png`;
 }
 
-// Render anh PNG bang html2canvas roi tai truc tiep ve may (khong mo tab moi,
-// khong dung Web Share API). Tra ve true neu thanh cong, false neu loi.
 export async function exportResultImage(state, grid, placements, exportBtn) {
-  // Luu lai innerHTML (khong chi textContent) de khoi phuc dung ca icon
-  // FontAwesome ben trong nut sau khi xuat xong
   const originalHTML = exportBtn ? exportBtn.innerHTML : '';
   if (exportBtn) {
     exportBtn.disabled = true;
@@ -102,7 +97,12 @@ export async function exportResultImage(state, grid, placements, exportBtn) {
     setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
     return true;
   } catch (err) {
-    alert('Lỗi khi xuất ảnh: ' + err.message);
+    await showModalAlert({
+      title: 'Lỗi xuất ảnh',
+      message: 'Không thể tạo ảnh minh chứng: ' + err.message,
+      mascot: 'assets/mascot/mascot-cry.png',
+      btnText: 'Đóng',
+    });
     console.error('exportResultImage lỗi:', err);
     return false;
   } finally {

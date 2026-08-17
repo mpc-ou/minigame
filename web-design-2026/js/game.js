@@ -1,5 +1,4 @@
-// game.js - "Nhac truong": giu state, goi cac module khac
-import { GRID_SIZE, KEYWORDS, HINT_INTERVAL_MS, HINT_URGENT_THRESHOLD_S, GGFORM_URL } from './config.js';
+import { GRID_SIZE, KEYWORDS, HINT_INTERVAL_MS, HINT_URGENT_THRESHOLD_S, GGFORM_URL, TOPIC } from './config.js';
 import { generateMatrix } from './matrix.js';
 import { createSelectionManager } from './selection.js';
 import { checkMatch } from './validator.js';
@@ -7,6 +6,8 @@ import { saveState, clearState } from './storage.js';
 import { randomInt, maskWord } from './utils.js';
 import * as anim from './animation.js';
 import { exportResultImage } from './capture.js';
+import { playTapSound, playDeselectSound, playMatchSound, playWinSound, playHintReadySound, playHintRevealSound } from './audio.js';
+import { showModalConfirm } from './modal.js';
 
 export function createGame({ dom, state }) {
   let grid = state.grid;
@@ -17,17 +18,13 @@ export function createGame({ dom, state }) {
   let exported = state.exported;
 
   const selectionMgr = createSelectionManager();
-  const cellElements = []; // ma tran cac the div, cellElements[r][c]
+  const cellElements = [];
 
-  // Goi y theo thoi gian: word -> chuoi da che ky tu (VD "B_T_ON"). Khong
-  // luu vao localStorage, chi ton tai trong phien choi hien tai.
-  const hintedWords = {};
+  const hintedWords = { ...(state.hintedWords || {}) };
   let hintTimerId = null;
-  let nextHintAt = null; // moc thoi gian (Date.now()) cua lan goi y tiep theo
+  let nextHintAt = null;
+  let isHintReady = false;
 
-  // O co the la diem giao nhau cua nhieu tu (VD: chu L cuoi cua HTML trung
-  // chu L dau cua LAYOUT). Chi coi la "het viec" khi TAT CA cac tu di qua
-  // o do da duoc tim thay, khong phai he 1 tu xong la khoa ca o.
   const cellWordsMap = {};
   Object.entries(placements).forEach(([word, cells]) => {
     cells.forEach(({ r, c }) => {
@@ -47,6 +44,7 @@ export function createGame({ dom, state }) {
     saveState({
       ...state,
       foundKeywords,
+      hintedWords,
       isWin: isReadOnly,
       infoSubmitted,
       exported,
@@ -73,9 +71,6 @@ export function createGame({ dom, state }) {
     }
   }
 
-  // Danh sach tu khoa khong hien chu that ra ngoai: tu chua tim thay ngay tu
-  // dau da hien so gach duoi dung bang do dai tu (VD "______") de nguoi choi
-  // biet duong ma tim, sau do goi y theo thoi gian se lo dan 1 vai ky tu
   function renderKeywordList() {
     dom.keywordListEl.innerHTML = '';
     KEYWORDS.forEach((word) => {
@@ -94,51 +89,157 @@ export function createGame({ dom, state }) {
     });
   }
 
-  // Cu HINT_INTERVAL_MS troi qua ma con tu chua tim duoc thi tu dong che
-  // bot ky tu 1 tu ngau nhien de goi y. Uu tien tu chua tung duoc goi y de
-  // moi lan hen gio deu mang lai thong tin moi cho nguoi choi.
-  //
-  // Chay tick moi giay de hien dem nguoc + doi bieu cam linh vat (binh
-  // thuong -> sot ruot khi gan den luc goi y), de nguoi choi biet truoc
-  // sap co goi y thay vi bi bat ngo (va do phai chup man hinh cho AI).
+  function renderTopic() {
+    if (dom.gameTopicEl) dom.gameTopicEl.textContent = TOPIC;
+    if (dom.coverTopicEl) dom.coverTopicEl.textContent = TOPIC;
+  }
+
+  function updateHintDisplay() {
+    if (isReadOnly) {
+      stopHintTimer(true);
+      return;
+    }
+
+    const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
+    if (unfound.length === 0) {
+      stopHintTimer(true);
+      return;
+    }
+
+    const notYetHinted = unfound.filter((w) => !hintedWords[w]);
+    if (notYetHinted.length === 0) {
+      stopHintTimer(false);
+      isHintReady = false;
+      dom.mascotHintPopupEl.classList.remove('hidden', 'clickable');
+      dom.hintCloudEl.classList.remove('ready');
+      dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+      dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
+      return;
+    }
+
+    if (!isHintReady && !hintTimerId) {
+      startHintTimer();
+    }
+  }
+
   function startHintTimer() {
+    if (isReadOnly) return;
+    const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
+    if (unfound.length === 0) {
+      stopHintTimer(true);
+      return;
+    }
+
+    const notYetHinted = unfound.filter((w) => !hintedWords[w]);
+    if (notYetHinted.length === 0) {
+      stopHintTimer(false);
+      isHintReady = false;
+      dom.mascotHintPopupEl.classList.remove('hidden', 'clickable');
+      dom.hintCloudEl.classList.remove('ready');
+      dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+      dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
+      return;
+    }
+
+    isHintReady = false;
+    dom.mascotHintPopupEl.classList.remove('hidden', 'clickable');
+    dom.hintCloudEl.classList.remove('ready');
+    dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+
     nextHintAt = Date.now() + HINT_INTERVAL_MS;
-    dom.hintWidgetEl.classList.remove('hidden');
     tickHintCountdown();
+    if (hintTimerId) clearInterval(hintTimerId);
     hintTimerId = setInterval(tickHintCountdown, 1000);
   }
 
   function tickHintCountdown() {
     const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
     if (unfound.length === 0) {
-      stopHintTimer();
+      stopHintTimer(true);
+      return;
+    }
+
+    const notYetHinted = unfound.filter((w) => !hintedWords[w]);
+    if (notYetHinted.length === 0) {
+      stopHintTimer(false);
+      isHintReady = false;
+      dom.hintCloudEl.classList.remove('ready');
+      dom.mascotHintPopupEl.classList.remove('clickable');
+      dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+      dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
       return;
     }
 
     const remainingMs = nextHintAt - Date.now();
     if (remainingMs <= 0) {
-      const notYetHinted = unfound.filter((w) => !hintedWords[w]);
-      const pool = notYetHinted.length > 0 ? notYetHinted : unfound;
-      const word = pool[randomInt(pool.length)];
-      hintedWords[word] = maskWord(word);
-      renderKeywordList();
-      nextHintAt = Date.now() + HINT_INTERVAL_MS;
+      // Countdown completed: hint is now ready to be clicked by player!
+      if (hintTimerId) {
+        clearInterval(hintTimerId);
+        hintTimerId = null;
+      }
+      isHintReady = true;
+      dom.hintCloudEl.classList.add('ready');
+      dom.mascotHintPopupEl.classList.add('clickable');
+      dom.hintMascotEl.src = 'assets/mascot/mascot-shy.png';
+      dom.hintCloudTextEl.textContent = '💡 Gợi ý?';
+      playHintReadySound();
+      return;
     }
 
-    const remainingS = Math.max(0, Math.ceil((nextHintAt - Date.now()) / 1000));
+    const remainingS = Math.max(1, Math.ceil(remainingMs / 1000));
     dom.hintMascotEl.src =
       remainingS <= HINT_URGENT_THRESHOLD_S
         ? 'assets/mascot/mascot-cry.png'
-        : 'assets/mascot/mascot-shy.png';
-    dom.hintCountdownEl.textContent = `Gợi ý tiếp theo sau: ${remainingS}s`;
+        : 'assets/mascot/mascot-idle.png';
+    dom.hintCloudTextEl.textContent = `${remainingS}s`;
   }
 
-  function stopHintTimer() {
+  function handleHintClick() {
+    if (!isHintReady || isReadOnly) return;
+
+    const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
+    const notYetHinted = unfound.filter((w) => !hintedWords[w]);
+    if (notYetHinted.length === 0) {
+      stopHintTimer(false);
+      isHintReady = false;
+      dom.hintCloudEl.classList.remove('ready');
+      dom.mascotHintPopupEl.classList.remove('clickable');
+      dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+      dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
+      return;
+    }
+
+    // Reveal one hint
+    const word = notYetHinted[randomInt(notYetHinted.length)];
+    hintedWords[word] = maskWord(word);
+    playHintRevealSound();
+    renderKeywordList();
+    persist();
+
+    // Check if more unhinted words remain
+    const remainingUnhinted = unfound.filter((w) => !hintedWords[w]);
+    if (remainingUnhinted.length === 0) {
+      stopHintTimer(false);
+      isHintReady = false;
+      dom.hintCloudEl.classList.remove('ready');
+      dom.mascotHintPopupEl.classList.remove('clickable');
+      dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+      dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
+    } else {
+      // Start next 30s countdown
+      startHintTimer();
+    }
+  }
+
+  function stopHintTimer(hideWidget = true) {
     if (hintTimerId) {
       clearInterval(hintTimerId);
       hintTimerId = null;
     }
-    dom.hintWidgetEl.classList.add('hidden');
+    isHintReady = false;
+    if (hideWidget && dom.mascotHintPopupEl) {
+      dom.mascotHintPopupEl.classList.add('hidden');
+    }
   }
 
   function renderProgress() {
@@ -159,9 +260,6 @@ export function createGame({ dom, state }) {
     dom.gridEl.classList.add('readonly');
   }
 
-  // Panel hien sau khi thang, noi dung thay doi theo tung buoc trong luong:
-  // chua nhap ten/MSSV -> da nhap nhung chua xuat anh -> da xuat (van cho
-  // xuat lai neu lo lam mat anh, chi rieng ten/MSSV la khong sua duoc nua)
   function renderPostWinPanel() {
     if (!isReadOnly) {
       dom.postWinPanelEl.classList.add('hidden');
@@ -179,7 +277,7 @@ export function createGame({ dom, state }) {
     }
 
     dom.postWinStatusEl.textContent = exported
-      ? `Đã xuất minh chứng cho ${state.fullName} — MSSV: ${state.studentId} ✓ (bấm lại nếu lỡ mất ảnh)`
+      ? `Đã xuất minh chứng cho ${state.fullName} — MSSV: ${state.studentId}`
       : `Người chơi: ${state.fullName} — MSSV: ${state.studentId}`;
     dom.exportActionBtn.classList.remove('hidden');
     dom.exportActionBtn.innerHTML = exported
@@ -192,10 +290,16 @@ export function createGame({ dom, state }) {
     }
   }
 
-  // Xoa toan bo du lieu van hien tai va tai lai trang tu dau (dung khi
-  // nguoi choi muon choi lai hoac nguoi khac muon muon may choi moi)
-  function handleReset() {
-    if (!window.confirm('Xóa toàn bộ tiến trình hiện tại và chơi lại từ đầu?')) return;
+  async function handleReset() {
+    const confirmed = await showModalConfirm({
+      title: 'Chơi lại từ đầu?',
+      message: 'Toàn bộ tiến trình ván chơi hiện tại sẽ bị xóa và ma trận mới sẽ được tạo.',
+      confirmText: 'Chơi lại',
+      cancelText: 'Tiếp tục chơi',
+      danger: true,
+      mascot: 'assets/mascot/mascot-cry.png',
+    });
+    if (!confirmed) return;
     clearState();
     window.location.reload();
   }
@@ -204,10 +308,15 @@ export function createGame({ dom, state }) {
     if (isReadOnly) return;
     if (isCellFullyFound(row, col)) return;
 
+    const prevCount = selectionMgr.getSelection().length;
     const selection = selectionMgr.tapCell({ row, col });
 
-    // Ve lai toan bo lua chon hien tai (xoa het roi to lai theo selection moi,
-    // ap dung cho ca truong hop bo chon 1 phan chuoi)
+    if (selection.length < prevCount) {
+      playDeselectSound();
+    } else {
+      playTapSound();
+    }
+
     clearAllSelectingClasses();
     const selectionWithLetters = selection.map((s) => ({
       ...s,
@@ -232,6 +341,7 @@ export function createGame({ dom, state }) {
 
   function onKeywordFound(word, selection) {
     foundKeywords.push(word);
+    playMatchSound();
     selection.forEach((s) => {
       const el = cellElements[s.row][s.col];
       anim.markCorrect(el);
@@ -244,16 +354,19 @@ export function createGame({ dom, state }) {
 
     if (foundKeywords.length === KEYWORDS.length) {
       onWin();
+    } else {
+      updateHintDisplay();
     }
   }
 
   function onWin() {
     isReadOnly = true;
     state.winTime = Date.now();
-    stopHintTimer();
+    stopHintTimer(true);
     applyReadOnly();
     persist();
     renderPostWinPanel();
+    playWinSound();
     anim.showDialog(dom.victoryDialogEl, true);
     anim.launchConfetti(dom.confettiCanvasEl);
   }
@@ -262,8 +375,6 @@ export function createGame({ dom, state }) {
     anim.hideDialog(dom.victoryDialogEl);
   }
 
-  // Mo modal nhap ten/MSSV - chi duoc goi khi chua infoSubmitted (nut
-  // "Luu minh chung" da bi an ngay sau khi nhap thanh cong 1 lan)
   function openInfoDialog() {
     dom.infoFormErrorEl.classList.add('hidden');
     dom.infoFormEl.reset();
@@ -306,6 +417,7 @@ export function createGame({ dom, state }) {
   }
 
   function init() {
+    renderTopic();
     renderGrid();
     renderKeywordList();
     renderProgress();
@@ -316,6 +428,10 @@ export function createGame({ dom, state }) {
     } else {
       startHintTimer();
     }
+
+    if (dom.mascotHintPopupEl) {
+      dom.mascotHintPopupEl.onclick = handleHintClick;
+    }
   }
 
   return {
@@ -325,6 +441,7 @@ export function createGame({ dom, state }) {
     handleInfoSubmit,
     handleExportAction,
     handleReset,
+    handleHintClick,
   };
 }
 

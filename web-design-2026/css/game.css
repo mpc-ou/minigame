@@ -1,33 +1,35 @@
-/* game.css */
-
 #game-screen {
   align-items: center;
-  padding: 24px 12px;
+  padding: 12px 10px;
 }
 
 .game-container {
   position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: 380px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .btn-info {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 34px;
-  height: 34px;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: var(--bg-input);
   border: 0.5px solid var(--accent-cyan);
   color: var(--accent-cyan);
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--glow-cyan);
   transition: transform 0.15s ease;
+  z-index: 10;
 }
 
 .btn-info:active {
@@ -38,56 +40,70 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 2px;
+  margin-bottom: 6px;
   text-align: center;
 }
 
-/* Font 'VT323' co day du bo dau tieng Viet (khac voi 'Press Start 2P' truoc
-   day thieu subset Vietnamese, gay loi hien thi cac ky tu co dau) */
 .game-title {
   font-family: 'VT323', 'Montserrat', sans-serif;
   color: var(--accent);
-  font-size: 34px;
+  font-size: clamp(28px, 6.5vw, 38px);
   line-height: 1.1;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-shadow: var(--glow-orange);
 }
 
 .game-subtitle {
   font-family: 'VT323', 'Montserrat', sans-serif;
   color: var(--accent-cyan);
-  font-size: 18px;
-  letter-spacing: 3px;
+  font-size: clamp(13px, 3.2vw, 16px);
+  letter-spacing: 2px;
   text-shadow: var(--glow-cyan);
+}
+
+.game-topic {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  background: rgba(0, 234, 255, 0.08);
+  border: 0.5px solid rgba(0, 234, 255, 0.3);
+  padding: 2px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  display: inline-block;
+  box-shadow: 0 0 10px rgba(0, 234, 255, 0.15);
 }
 
 .progress-badge {
   background: var(--bg-input);
   border: 0.5px solid var(--accent-cyan);
-  border-radius: var(--radius-sm);
-  padding: 4px 12px;
+  border-radius: 6px;
+  padding: 2px 10px;
   color: var(--accent-cyan);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   box-shadow: var(--glow-cyan);
+  margin-top: 1px;
 }
 
 .keyword-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 4px;
+  margin-bottom: 8px;
 }
 
 .keyword-chip {
   background: var(--bg-input);
   border: 0.5px solid var(--border-color);
   color: var(--text-secondary);
-  font-size: 13px;
-  padding: 5px 10px;
-  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  padding: 3px 8px;
+  border-radius: 6px;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
@@ -114,71 +130,188 @@
   border: 0.5px solid var(--accent-cyan);
   border-radius: var(--radius-md);
   box-shadow: var(--glow-cyan);
-  padding: 5px;
-  overflow: auto;
-  max-height: 65vh;
+  padding: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: min(340px, 86vw);
 }
 
-/* Goc HUD trang tri kieu cyber, cho lưới chữ đỡ trống trải */
 .grid-wrapper::before,
 .grid-wrapper::after {
   content: '';
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border: 2px solid var(--accent-purple);
   pointer-events: none;
 }
 
 .grid-wrapper::before {
-  top: -2px;
-  left: -2px;
+  top: -1px;
+  left: -1px;
   border-right: none;
   border-bottom: none;
 }
 
 .grid-wrapper::after {
-  bottom: -2px;
-  right: -2px;
+  bottom: -1px;
+  right: -1px;
   border-left: none;
   border-top: none;
 }
 
-/* Widget bao truoc goi y: hien dem nguoc + linh vat, doi bieu cam khi gan
-   den luc duoc goi y (xem HINT_URGENT_THRESHOLD_S trong config.js) */
-.hint-widget {
+/* Floating Mascot Hint Popup in bottom-right */
+.mascot-hint-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 80;
+  user-select: none;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+}
+
+.hint-cloud {
+  position: relative;
+  background: var(--bg-card);
+  border: 1.5px solid var(--accent-cyan);
+  color: var(--text-primary);
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  box-shadow: var(--glow-cyan);
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+/* Cloud / Speech bubble tail */
+.hint-cloud::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--accent-cyan);
+  transition: border-top-color 0.25s ease;
+}
+
+/* When countdown reaches 0: hint is ready and clickable */
+.hint-cloud.ready {
+  background: var(--accent);
+  border-color: #ffd644;
+  color: #160700;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 0 18px rgba(255, 122, 26, 0.85), 0 0 5px #ffd644;
+  animation: cloud-bounce 0.85s infinite alternate ease-in-out;
+}
+
+.hint-cloud.ready::after {
+  border-top-color: #ffd644;
+}
+
+@keyframes cloud-bounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    transform: translateY(-5px) scale(1.08);
+  }
+}
+
+.hint-mascot-img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+  transition: transform 0.2s ease;
+}
+
+.mascot-hint-popup.clickable {
+  cursor: pointer;
+}
+
+.mascot-hint-popup.clickable:hover .hint-mascot-img {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.mascot-hint-popup.clickable:active {
+  transform: scale(0.94);
+}
+
+/* 3-2-1 Countdown Overlay */
+.countdown-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 15, 0.88);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 10px;
-  padding: 8px 12px;
-  background: var(--bg-input);
-  border: 0.5px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  z-index: 200;
 }
 
-.hint-mascot {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  flex-shrink: 0;
+.countdown-card {
+  text-align: center;
+  user-select: none;
 }
 
-.hint-countdown {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
+.countdown-number {
+  font-family: 'VT323', monospace;
+  font-size: 110px;
+  color: var(--accent);
+  text-shadow: var(--glow-orange);
+  animation: countdown-pop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.countdown-number.go {
+  color: var(--success);
+  text-shadow: 0 0 30px rgba(46, 255, 160, 0.85);
+  font-size: 100px;
+}
+
+@keyframes countdown-pop {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+
+  45% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+
+  75% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0.95;
+  }
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(var(--grid-size), 40px);
-  grid-template-rows: repeat(var(--grid-size), 40px);
+  grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr));
   gap: 3px;
-  width: max-content;
+  width: 100%;
   margin: 0 auto;
   user-select: none;
+  aspect-ratio: 1;
 }
 
 .grid.readonly {
@@ -187,13 +320,14 @@
 }
 
 .grid-cell {
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg-input);
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 500;
+  border-radius: 5px;
+  font-size: clamp(13px, 3.8vw, 16px);
+  font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
   transition: background 0.15s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -206,42 +340,45 @@
 .hint-text {
   text-align: center;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  margin-top: 8px;
+  margin-top: 5px;
 }
 
 .post-win-panel {
-  margin-top: 14px;
-  padding: 14px;
+  margin-top: 8px;
+  padding: 10px 12px;
   background: var(--bg-input);
   border: 0.5px solid var(--accent-purple);
-  border-radius: var(--radius-md);
+  border-radius: 10px;
   box-shadow: var(--glow-purple);
   text-align: center;
+  width: 100%;
+  max-width: min(340px, 86vw);
 }
 
 .post-win-status {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+  line-height: 1.35;
 }
 
 .btn-ggform {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  height: 46px;
-  margin-top: 10px;
+  height: 36px;
+  margin-top: 6px;
   background: var(--success-bg);
   color: var(--success);
   border: 0.5px solid var(--success);
-  font-weight: 700;
-  font-size: 14px;
-  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 8px;
   text-decoration: none;
   transition: transform 0.15s ease;
 }
@@ -253,14 +390,15 @@
 .btn-reset {
   display: block;
   width: 100%;
-  height: 44px;
-  margin-top: 14px;
+  max-width: min(340px, 86vw);
+  height: 36px;
+  margin-top: 8px;
   background: transparent;
   border: 0.5px solid var(--border-color);
   color: var(--text-secondary);
-  font-weight: 700;
-  font-size: 13px;
-  border-radius: 10px;
+  font-weight: 600;
+  font-size: 12px;
+  border-radius: 8px;
   letter-spacing: 0.5px;
   transition: transform 0.15s ease;
 }
