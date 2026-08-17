@@ -31,42 +31,11 @@ jobs:
       - name: Precheck AUTHOR.MD in Minigames
         run: node .github/scripts/check-author.js
 
-      - name: Generate and Validate data.json
-        run: |
-          node -e '
-          const fs = require("fs");
-          const path = require("path");
-
-          let games = [];
-          if (fs.existsSync("data.json")) {
-            try {
-              games = JSON.parse(fs.readFileSync("data.json", "utf8"));
-            } catch (e) {
-              console.warn("Existing data.json was invalid, recreating...", e);
-            }
-          }
-
-          if (!Array.isArray(games) || games.length === 0) {
-            games = [
-              {
-                id: "web-design-2026",
-                name: "Word Hunt Game",
-                competition: "WEB-DESIGN 2026",
-                topic: "Lập trình & Thiết kế Web",
-                path: "./web-design-2026/",
-                icon: "web-design-2026/assets/logo/logo.png",
-                mascot: "web-design-2026/assets/mascot/mascot-idle.png",
-                description: "Minigame tìm từ khóa ẩn trong ma trận chữ, thử thách chính thức của cuộc thi WEB-DESIGN 2026 do CLB Lập Trình Trên Thiết Bị Di Động tổ chức.",
-                author: "CLB Lập Trình Trên Thiết Bị Di Động"
-              }
-            ];
-          }
-
-          fs.writeFileSync("data.json", JSON.stringify(games, null, 2));
-          console.log("data.json successfully generated with " + games.length + " games.");
-          '
+      - name: Generate data.json from AUTHOR.MD
+        run: node .github/scripts/generate-data.js
 
       - name: Deploy to gh-pages branch
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
