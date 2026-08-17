@@ -1,0 +1,96 @@
+/* welcome.css - man hinh bia (cover-screen) + form nhap ho ten/MSSV (info-dialog) */
+
+.cover-card {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-card);
+  border: 0.5px solid var(--accent-purple);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glow-purple);
+  padding: 36px 24px;
+  text-align: center;
+}
+
+.cover-logo {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: var(--radius-md);
+  display: block;
+  object-fit: contain;
+}
+
+.cover-card .game-title {
+  margin-bottom: 4px;
+}
+
+.cover-mascot {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  margin: 12px auto 0;
+  display: block;
+}
+
+.cover-status {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  height: 44px;
+  background: var(--bg-input);
+  border: 0.5px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0 14px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.btn-primary {
+  width: 100%;
+  height: 48px;
+  background: var(--accent);
+  color: var(--accent-dark);
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 10px;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+  box-shadow: var(--glow-orange);
+  transition: transform 0.15s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 12px;
+  margin-top: -8px;
+  margin-bottom: 12px;
+}

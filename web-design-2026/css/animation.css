@@ -1,0 +1,58 @@
+/* animation.css - Toan bo @keyframes tach rieng */
+
+.confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  /* Thap hon .dialog-overlay (z-index:100) de phao hoa khong de len va
+     lam roi noi dung Victory Dialog dang hien cung luc */
+  z-index: 90;
+}
+
+.cell-correct {
+  background: var(--success-bg) !important;
+  color: var(--success) !important;
+}
+
+.cell-selecting {
+  background: var(--accent) !important;
+  color: var(--accent-dark) !important;
+  animation: glow 0.3s ease;
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 0 0 rgba(255, 122, 26, 0.6); }
+  100% { box-shadow: 0 0 0 4px rgba(255, 122, 26, 0); }
+}
+
+.cell-pulse {
+  animation: sweep 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes sweep {
+  0% { transform: scale(1); background: var(--accent) !important; }
+  45% { transform: scale(1.25); }
+  70% { transform: scale(0.92); }
+  100% { transform: scale(1); background: var(--success-bg) !important; }
+}
+
+.cell-invalid {
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.btn-primary:active,
+.btn-export:active,
+.btn-close:active {
+  animation: ripple 0.3s ease;
+}
+
+@keyframes ripple {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}

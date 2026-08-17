@@ -1,0 +1,251 @@
+/* popup.css */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.dialog-overlay.show {
+  opacity: 1;
+}
+
+.dialog-box {
+  background: var(--bg-card);
+  border: 0.5px solid var(--accent-purple);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glow-purple);
+  padding: 32px 24px;
+  width: 90%;
+  max-width: 340px;
+  text-align: center;
+  transform: scale(0.85);
+  transition: transform 0.25s ease;
+}
+
+.dialog-overlay.show .dialog-box {
+  transform: scale(1);
+}
+
+.dialog-mascot {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin: 0 auto 8px;
+  display: block;
+}
+
+.dialog-title {
+  font-family: 'VT323', 'Montserrat', sans-serif;
+  font-size: 28px;
+  line-height: 1.3;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-shadow: var(--glow-orange);
+  margin-bottom: 12px;
+}
+
+.dialog-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.dialog-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-export {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  padding: 0 20px;
+  background: var(--accent);
+  color: var(--accent-dark);
+  font-weight: 700;
+  border-radius: 10px;
+  font-size: 15px;
+  box-shadow: var(--glow-orange);
+}
+
+.btn-export:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-close {
+  height: 46px;
+  background: transparent;
+  border: 0.5px solid var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+/* GUIDE DIALOG - noi dung dai hon dialog thuong, can scroll rieng va can trai */
+.guide-box {
+  max-width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.guide-content {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.guide-content h3 {
+  font-family: 'VT323', 'Montserrat', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--accent-cyan);
+  text-shadow: var(--glow-cyan);
+  margin: 16px 0 8px;
+}
+
+.guide-content h3:first-child {
+  margin-top: 0;
+}
+
+.guide-content ol {
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.guide-content li {
+  margin-bottom: 8px;
+}
+
+.guide-content strong {
+  color: var(--text-primary);
+}
+
+/* Capture card - dung khi xuat anh, luon dat ngoai man hinh
+   Font game: "VT323" cho toan bo (co day du dau tieng Viet, khac voi
+   "Press Start 2P" truoc day bi loi vi thieu subset Vietnamese) */
+.capture-card {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  width: 520px;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  padding: 40px;
+  border: 3px solid var(--accent);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 40px rgba(255, 122, 26, 0.25) inset;
+  font-family: 'VT323', monospace;
+}
+
+.capture-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.capture-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  display: block;
+  object-fit: contain;
+}
+
+.capture-title {
+  color: var(--accent);
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.2;
+  letter-spacing: 1px;
+  text-shadow: var(--glow-orange);
+}
+
+.capture-competition {
+  color: var(--accent-cyan);
+  font-size: 20px;
+  letter-spacing: 2px;
+  margin-top: 2px;
+}
+
+.capture-subtitle {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.capture-info p {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.capture-keywords {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.capture-chip {
+  background: var(--success-bg);
+  color: var(--success);
+  font-size: 14px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}
+
+.capture-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size), 30px);
+  gap: 3px;
+  margin: 18px 0;
+  justify-content: center;
+}
+
+.capture-cell {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border-radius: 4px;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.capture-cell.correct {
+  background: var(--success-bg);
+  color: var(--success);
+  font-weight: 700;
+}
+
+.capture-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #777;
+  border-top: 2px solid var(--border-color);
+  padding-top: 14px;
+}
