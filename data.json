@@ -1,0 +1,13 @@
+[
+  {
+    "id": "web-design-2026",
+    "name": "Word Hunt Game",
+    "competition": "WEB-DESIGN 2026",
+    "topic": "Lập trình & Thiết kế Web",
+    "path": "./web-design-2026/",
+    "icon": "web-design-2026/assets/logo/logo.png",
+    "mascot": "web-design-2026/assets/mascot/mascot-idle.png",
+    "description": "Minigame tìm từ khóa ẩn trong ma trận chữ, thử thách chính thức của cuộc thi WEB-DESIGN 2026 do CLB Lập Trình Trên Thiết Bị Di Động tổ chức.",
+    "author": "CLB Lập Trình Trên Thiết Bị Di Động"
+  }
+]

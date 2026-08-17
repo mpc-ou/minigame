@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Word Hunt Game - WEB-DESIGN 2026</title>
+    <meta name="description"
+        content="Word Hunt Game - minigame tìm từ khóa ẩn trong ma trận chữ, thử thách chính thức của cuộc thi WEB-DESIGN 2026 do CLB Lập Trình Trên Thiết Bị Di Động tổ chức." />
+    <meta name="keywords" content="Word Hunt Game, web design 2026, minigame tìm từ, clb lập trình di động" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Word Hunt Game - WEB-DESIGN 2026" />
+    <meta property="og:description"
+        content="Minigame tìm từ khóa ẩn trong ma trận chữ - thử thách của cuộc thi WEB-DESIGN 2026." />
+    <meta property="og:image" content="assets/logo/logo.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Word Hunt Game - WEB-DESIGN 2026" />
+    <meta name="twitter:description"
+        content="Minigame tìm từ khóa ẩn trong ma trận chữ - thử thách của cuộc thi WEB-DESIGN 2026." />
+    <meta name="twitter:image" content="assets/logo/logo.png" />
+    <link rel="icon" type="image/png" href="./assets/logo/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=VT323&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/welcome.css" />
+    <link rel="stylesheet" href="./css/game.css" />
+    <link rel="stylesheet" href="./css/popup.css" />
+    <link rel="stylesheet" href="./css/animation.css" />
+</head>
+
+<body>
+
+    <section id="cover-screen" class="screen active">
+        <div class="cover-card">
+            <button id="sound-btn-cover" class="btn-sound" aria-label="Bật/Tắt âm thanh">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button id="info-btn-cover" class="btn-info" aria-label="Hướng dẫn">
+                <i class="fa-solid fa-circle-info"></i>
+            </button>
+            <img src="./assets/logo/logo.png" alt="Logo CLB Lập Trình Trên Thiết Bị Di Động" class="cover-logo" />
+            <p class="game-title">Word Hunt Game</p>
+            <p class="game-subtitle">WEB-DESIGN 2026</p>
+            <p class="game-topic" id="cover-topic">Chủ đề: Lập trình &amp; Thiết kế Web</p>
+            <img src="./assets/mascot/mascot-idle.png" alt="Linh vật cáo của CLB" class="cover-mascot" />
+            <p class="cover-status" id="cover-status"></p>
+            <button id="play-btn" class="btn-primary">Chơi</button>
+            <button id="cover-reset-btn" class="btn-reset">Xóa kết quả</button>
+        </div>
+    </section>
+
+    <section id="game-screen" class="screen">
+        <div class="game-container">
+            <button id="sound-btn-game" class="btn-sound" aria-label="Bật/Tắt âm thanh">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button id="info-btn-game" class="btn-info" aria-label="Hướng dẫn">
+                <i class="fa-solid fa-circle-info"></i>
+            </button>
+            <div class="game-header">
+                <p class="game-title">Word Hunt Game</p>
+                <p class="game-subtitle">WEB-DESIGN 2026</p>
+                <p class="game-topic" id="game-topic">Chủ đề: Lập trình &amp; Thiết kế Web</p>
+                <div class="progress-badge" id="progress">0/5</div>
+            </div>
+
+            <div class="keyword-list" id="keyword-list"></div>
+
+            <div class="grid-wrapper">
+                <div class="grid" id="grid"></div>
+            </div>
+            <p class="hint-text">Tap từng ô để chọn từ khóa</p>
+
+            <div id="post-win-panel" class="post-win-panel hidden">
+                <p class="post-win-status" id="post-win-status"></p>
+                <button id="save-proof-btn" class="btn-primary hidden">Lưu minh chứng</button>
+                <button id="export-action-btn" class="btn-export hidden">
+                    <i class="fa-solid fa-download"></i> Xuất ảnh
+                </button>
+                <a id="ggform-link" class="btn-ggform hidden" target="_blank" rel="noopener">
+                    <i class="fa-solid fa-paper-plane"></i> Nộp minh chứng
+                </a>
+            </div>
+
+            <button id="reset-btn" class="btn-reset">Xóa kết quả / Chơi lại</button>
+        </div>
+    </section>
+
+    <!-- Floating Mascot Hint Popup in bottom-right -->
+    <div id="mascot-hint-popup" class="mascot-hint-popup hidden" title="Gợi ý từ khóa">
+        <div id="hint-cloud" class="hint-cloud">
+            <span id="hint-cloud-text" class="hint-cloud-text">30s</span>
+        </div>
+        <img id="hint-mascot" src="./assets/mascot/mascot-idle.png" alt="Linh vật cáo" class="hint-mascot-img" />
+    </div>
+
+    <!-- 3-2-1 GO Countdown Overlay -->
+    <div id="countdown-overlay" class="countdown-overlay hidden">
+        <div class="countdown-card">
+            <div id="countdown-number" class="countdown-number">3</div>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+
+    <div id="victory-dialog" class="dialog-overlay hidden">
+        <div class="dialog-box">
+            <img src="assets/mascot/mascot-cheer.png" alt="Linh vật cáo ăn mừng" class="dialog-mascot" />
+            <p class="dialog-title">Chúc mừng!</p>
+            <p class="dialog-text">Bạn đã hoàn thành thử thách. Bấm "Lưu minh chứng" bên dưới để lưu kết quả.</p>
+            <div class="dialog-actions">
+                <button id="close-victory-btn" class="btn-close">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert / Confirm Modal Dialog -->
+    <div id="custom-modal" class="dialog-overlay hidden">
+        <div class="dialog-box modal-box">
+            <img id="custom-modal-mascot" src="assets/mascot/mascot-idle.png" alt="Linh vật" class="dialog-mascot" />
+            <p id="custom-modal-title" class="dialog-title">Thông báo</p>
+            <p id="custom-modal-text" class="dialog-text">Nội dung thông báo</p>
+            <div id="custom-modal-actions" class="dialog-actions modal-actions"></div>
+        </div>
+    </div>
+
+    <div id="guide-dialog" class="dialog-overlay hidden">
+        <div class="dialog-box guide-box">
+            <button id="close-guide-btn" class="dialog-close-icon" aria-label="Đóng">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <p class="dialog-title">Hướng dẫn</p>
+            <div class="guide-content">
+                <h3>Cách chơi</h3>
+                <ol>
+                    <li>Tap vào 1 ô chữ để bắt đầu, tap tiếp ô cuối cùng của từ để chọn cả chuỗi - chỉ đọc được theo
+                        4 hướng: →, ↓, ↘, ↙.</li>
+                    <li>Tap lại vào 1 ô đang chọn để bỏ chọn ô đó và các ô phía sau trong chuỗi.</li>
+                    <li>Có 5 từ khóa ẩn trong ma trận. Còn từ nào chưa tìm ra thì cứ 30 giây trôi qua, hệ thống sẽ
+                        tự động hé lộ vài ký tự để gợi ý.</li>
+                    <li>Tìm đủ 5/5 từ khóa để hoàn thành thử thách.</li>
+                </ol>
+                <h3>Lưu &amp; nộp minh chứng</h3>
+                <ol>
+                    <li>Sau khi thắng, bấm <strong>"Lưu minh chứng"</strong> và nhập đúng Họ tên + Mã số sinh viên
+                        (chỉ nhập được 1 lần cho mỗi lượt chơi, nên gõ cẩn thận).</li>
+                    <li>Bấm <strong>"Xuất ảnh"</strong> để tải ảnh minh chứng (định dạng PNG) về máy - có thể bấm
+                        xuất lại bất cứ lúc nào nếu lỡ làm mất ảnh.</li>
+                    <li>Nếu màn hình có nút <strong>"Nộp minh chứng"</strong>, bấm vào để nộp trực tiếp qua Google
+                        Form của CLB. Nếu chưa thấy nút này, hãy gửi ảnh minh chứng (kèm Họ tên, MSSV) cho Ban tổ
+                        chức CLB Lập Trình Trên Thiết Bị Di Động qua kênh liên hệ chính thức để được cộng điểm rèn
+                        luyện (DRL).</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-dialog" class="dialog-overlay hidden">
+        <div class="dialog-box">
+            <p class="dialog-title">Lưu minh chứng</p>
+            <p class="dialog-text">Nhập họ tên và MSSV. Thông tin này chỉ được nhập 1 lần cho mỗi lượt chơi.</p>
+            <form id="info-form">
+                <div class="form-group">
+                    <label for="full-name">Họ và tên</label>
+                    <input type="text" id="full-name" required placeholder="Nguyễn Văn A" />
+                </div>
+                <div class="form-group">
+                    <label for="student-id">Mã số sinh viên</label>
+                    <input type="text" id="student-id" required inputmode="numeric" maxlength="10"
+                        placeholder="xxxxxxxxxx" />
+                </div>
+                <p id="form-error" class="form-error hidden"></p>
+                <div class="dialog-actions">
+                    <button type="submit" class="btn-primary">Xác nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module" src="./js/main.js"></script>
+</body>
+
+</html>

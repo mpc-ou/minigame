@@ -1,0 +1,85 @@
+:root {
+  --bg-main: #08080f;
+  --bg-card: #111120;
+  --bg-input: #181829;
+  --border-color: #2a2a45;
+  --accent: #ff7a1a;
+  --accent-dark: #2c1400;
+  --accent-cyan: #00eaff;
+  --accent-purple: #b026ff;
+  --text-primary: #f0f0f7;
+  --text-secondary: #b0b0d6;
+  --success: #2effa0;
+  --success-bg: #123322;
+  --danger: #ff3860;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --glow-orange: 0 0 14px rgba(255, 122, 26, 0.45);
+  --glow-cyan: 0 0 14px rgba(0, 234, 255, 0.35);
+  --glow-purple: 0 0 16px rgba(176, 38, 255, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  background-color: var(--bg-main);
+  background-image:
+    linear-gradient(rgba(0, 234, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 234, 255, 0.07) 1px, transparent 1px),
+    radial-gradient(circle at 15% 0%, rgba(0, 234, 255, 0.09), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(176, 38, 255, 0.1), transparent 45%);
+  background-size: 42px 42px, 42px 42px, auto, auto;
+  animation: grid-drift 2s linear infinite;
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes grid-drift {
+  0% {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+
+  100% {
+    background-position: 42px 42px, 42px 42px, 0 0, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 20px 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen.active {
+  display: flex;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input {
+  font-family: inherit;
+}
+
+.hidden {
+  display: none !important;
+}
