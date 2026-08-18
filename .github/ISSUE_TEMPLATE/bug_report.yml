@@ -9,6 +9,10 @@ body:
       label: Điều kiện tiên quyết
       description: Vui lòng đọc tài liệu hướng dẫn phân loại để định danh bug chính xác.
       options:
+        - label: Tôi đã đọc tài liệu về [Các viết báo cáo](https://notebook.konnn04.dev/docs/kiem-thu-phan-mem/02-viet-bao-cao-loi/01-yeu-cau-bao-cao-loi)
+          required: true
+        - label: Tôi đã đọc tài liệu về [Các chuẩn bị tệp đính kèm](https://notebook.konnn04.dev/docs/kiem-thu-phan-mem/02-viet-bao-cao-loi/02-tep-dinh-kem)
+          required: true
         - label: Tôi đã đọc tài liệu về [Lỗi chức năng](https://notebook.konnn04.dev/docs/kiem-thu-phan-mem/03-phan-loai-bug/01-loi-chuc-nang)
           required: true
         - label: Tôi đã đọc tài liệu về [Lỗi nội dung](https://notebook.konnn04.dev/docs/kiem-thu-phan-mem/03-phan-loai-bug/02-loi-noi-dung)
