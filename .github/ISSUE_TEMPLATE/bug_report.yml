@@ -1,0 +1,81 @@
+name: 🐛 Bug Report
+description: Báo cáo lỗi kỹ thuật của hệ thống
+title: "[BUG] - "
+labels: ["bug"]
+body:
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Điều kiện tiên quyết
+      description: Vui lòng đọc tài liệu hướng dẫn phân loại để định danh bug chính xác.
+      options:
+        - label: Tôi đã đọc tài liệu về [Lỗi chức năng](https://konnn04.dev)
+          required: true
+        - label: Tôi đã đọc tài liệu về [Lỗi nội dung](https://konnn04.dev)
+          required: true
+        - label: Tôi đã đọc tài liệu về [Lỗi hiển thị](https://konnn04.dev)
+          required: true
+
+  - type: dropdown
+    id: bug_type
+    attributes:
+      label: Loại Bug
+      description: Chọn phân loại phù hợp dựa trên tài liệu đã đọc
+      options:
+        - Visual
+        - Content
+        - Function
+    validations:
+      required: true
+
+  - type: input
+    id: error_link
+    attributes:
+      label: Link thời điểm lỗi
+      placeholder: "https://example.com"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Các bước tái tạo
+      placeholder: |
+        1. Vào trang...
+        2. Bấm nút...
+        3. Thấy lỗi xuất hiện...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Mong đợi
+      placeholder: Hệ thống nên hoạt động như thế nào?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Thực tế
+      placeholder: Hệ thống đang bị lỗi ra sao?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Thiết bị, trình duyệt, môi trường
+      placeholder: |
+        - Thiết bị: ...
+        - Trình duyệt: ...
+        - Môi trường: (Ví dụ: Staging / Production)
+    validations:
+      required: true
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Các file đính kèm
+      placeholder: Kéo thả hình ảnh hoặc video minh họa vào đây
