@@ -22,7 +22,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=VT323&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="./assets/vendor/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="./css/style.css" />
     <link rel="stylesheet" href="./css/welcome.css" />
     <link rel="stylesheet" href="./css/game.css" />
@@ -32,10 +32,33 @@
 
 <body>
 
+    <div class="bg-wave-orb orb-1"></div>
+    <div class="bg-wave-orb orb-2"></div>
+    <div class="bg-wave-orb orb-3"></div>
+
+    <div id="page-intro-loader" class="page-intro-loader">
+        <div class="intro-curtain">
+            <div class="intro-hanging-cord">
+                <div class="cord-line"></div>
+                <div class="cord-handle"></div>
+            </div>
+
+            <div class="intro-mascot-container">
+                <img src="./assets/mascot/mascot-cheer.png" alt="Linh vật nhảy lên kéo rèm" class="intro-mascot-img" />
+                <div class="intro-mascot-sweat">💦</div>
+            </div>
+            <p class="intro-skip-hint"><i class="fa-solid fa-hand-pointer"></i> Chạm để mở nhanh</p>
+        </div>
+    </div>
+
     <section id="cover-screen" class="screen active">
         <div class="cover-card">
-            <button id="sound-btn-cover" class="btn-sound" aria-label="Bật/Tắt âm thanh">
+            <button id="sound-btn-cover" class="btn-sound" aria-label="Bật/Tắt hiệu ứng âm thanh"
+                title="Hiệu ứng âm thanh">
                 <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button id="music-btn-cover" class="btn-music" aria-label="Bật/Tắt nhạc nền" title="Nhạc nền">
+                <i class="fa-solid fa-music"></i>
             </button>
             <button id="info-btn-cover" class="btn-info" aria-label="Hướng dẫn">
                 <i class="fa-solid fa-circle-info"></i>
@@ -43,18 +66,21 @@
             <img src="./assets/logo/logo.png" alt="Logo CLB Lập Trình Trên Thiết Bị Di Động" class="cover-logo" />
             <p class="game-title">Word Hunt Game</p>
             <p class="game-subtitle">WEB-DESIGN 2026</p>
-            <p class="game-topic" id="cover-topic">Chủ đề: Lập trình &amp; Thiết kế Web</p>
             <img src="./assets/mascot/mascot-idle.png" alt="Linh vật cáo của CLB" class="cover-mascot" />
             <p class="cover-status" id="cover-status"></p>
-            <button id="play-btn" class="btn-primary">Chơi</button>
+            <button id="play-btn" class="btn-primary btn-cta-pulse">Chơi</button>
             <button id="cover-reset-btn" class="btn-reset">Xóa kết quả</button>
         </div>
     </section>
 
     <section id="game-screen" class="screen">
         <div class="game-container">
-            <button id="sound-btn-game" class="btn-sound" aria-label="Bật/Tắt âm thanh">
+            <button id="sound-btn-game" class="btn-sound" aria-label="Bật/Tắt hiệu ứng âm thanh"
+                title="Hiệu ứng âm thanh">
                 <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button id="music-btn-game" class="btn-music" aria-label="Bật/Tắt nhạc nền" title="Nhạc nền">
+                <i class="fa-solid fa-music"></i>
             </button>
             <button id="info-btn-game" class="btn-info" aria-label="Hướng dẫn">
                 <i class="fa-solid fa-circle-info"></i>
@@ -62,7 +88,7 @@
             <div class="game-header">
                 <p class="game-title">Word Hunt Game</p>
                 <p class="game-subtitle">WEB-DESIGN 2026</p>
-                <p class="game-topic" id="game-topic">Chủ đề: Lập trình &amp; Thiết kế Web</p>
+                <p class="game-topic" id="game-topic">Chủ đề: Các thành phần trong một trang web</p>
                 <div class="progress-badge" id="progress">0/5</div>
             </div>
 
@@ -75,8 +101,8 @@
 
             <div id="post-win-panel" class="post-win-panel hidden">
                 <p class="post-win-status" id="post-win-status"></p>
-                <button id="save-proof-btn" class="btn-primary hidden">Lưu minh chứng</button>
-                <button id="export-action-btn" class="btn-export hidden">
+                <button id="save-proof-btn" class="btn-primary btn-cta-pulse hidden">Lưu minh chứng</button>
+                <button id="export-action-btn" class="btn-export btn-cta-pulse hidden">
                     <i class="fa-solid fa-download"></i> Xuất ảnh
                 </button>
                 <a id="ggform-link" class="btn-ggform hidden" target="_blank" rel="noopener">
@@ -88,15 +114,13 @@
         </div>
     </section>
 
-    <!-- Floating Mascot Hint Popup in bottom-right -->
     <div id="mascot-hint-popup" class="mascot-hint-popup hidden" title="Gợi ý từ khóa">
+        <img id="hint-mascot" src="./assets/mascot/mascot-idle.png" alt="Linh vật cáo" class="hint-mascot-img" />
         <div id="hint-cloud" class="hint-cloud">
             <span id="hint-cloud-text" class="hint-cloud-text">30s</span>
         </div>
-        <img id="hint-mascot" src="./assets/mascot/mascot-idle.png" alt="Linh vật cáo" class="hint-mascot-img" />
     </div>
 
-    <!-- 3-2-1 GO Countdown Overlay -->
     <div id="countdown-overlay" class="countdown-overlay hidden">
         <div class="countdown-card">
             <div id="countdown-number" class="countdown-number">3</div>
@@ -133,33 +157,19 @@
             </button>
             <p class="dialog-title">Hướng dẫn</p>
             <div class="guide-content">
-                <h3>Cách chơi</h3>
-                <ol>
-                    <li>Tap vào 1 ô chữ để bắt đầu, tap tiếp ô cuối cùng của từ để chọn cả chuỗi - chỉ đọc được theo
-                        4 hướng: →, ↓, ↘.</li>
-                    <li>Tap lại vào 1 ô đang chọn để bỏ chọn ô đó và các ô phía sau trong chuỗi.</li>
-                    <li>Có 5 từ khóa ẩn trong ma trận. Còn từ nào chưa tìm ra thì cứ 30 giây trôi qua, hệ thống sẽ
-                        tự động hé lộ vài ký tự để gợi ý.</li>
-                    <li>Tìm đủ 5/5 từ khóa để hoàn thành thử thách.</li>
-                </ol>
-                <h3>Lưu &amp; nộp minh chứng</h3>
-                <ol>
-                    <li>Sau khi thắng, bấm <strong>"Lưu minh chứng"</strong> và nhập đúng Họ tên + Mã số sinh viên
-                        (chỉ nhập được 1 lần cho mỗi lượt chơi, nên gõ cẩn thận).</li>
-                    <li>Bấm <strong>"Xuất ảnh"</strong> để tải ảnh minh chứng (định dạng PNG) về máy - có thể bấm
-                        xuất lại bất cứ lúc nào nếu lỡ làm mất ảnh.</li>
-                    <li>Nếu màn hình có nút <strong>"Nộp minh chứng"</strong>, bấm vào để nộp trực tiếp qua Google
-                        Form của CLB. Nếu chưa thấy nút này, hãy gửi ảnh minh chứng (kèm Họ tên, MSSV) cho Ban tổ
-                        chức CLB Lập Trình Trên Thiết Bị Di Động qua kênh liên hệ chính thức để được cộng điểm rèn
-                        luyện (DRL).</li>
-                </ol>
-                <p style="text-align: right;">Credit: <a href="https://github.com/BapDev06" target="_blank">BapDev06</a></p>
+                <div class="guide-loading">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span>Đang tải hướng dẫn...</span>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="info-dialog" class="dialog-overlay hidden">
         <div class="dialog-box">
+            <button type="button" id="close-info-btn" class="dialog-close-icon" aria-label="Đóng">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
             <p class="dialog-title">Lưu minh chứng</p>
             <p class="dialog-text">Nhập họ tên và MSSV. Thông tin này chỉ được nhập 1 lần cho mỗi lượt chơi.</p>
             <form id="info-form">
@@ -169,8 +179,8 @@
                 </div>
                 <div class="form-group">
                     <label for="student-id">Mã số sinh viên</label>
-                    <input type="text" id="student-id" required inputmode="numeric" maxlength="10"
-                        placeholder="xxxxxxxxxx" />
+                    <input type="text" id="student-id" required inputmode="numeric" maxlength="12"
+                        placeholder="7 - 12 chữ số" />
                 </div>
                 <p id="form-error" class="form-error hidden"></p>
                 <div class="dialog-actions">
@@ -180,7 +190,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="./assets/vendor/html2canvas-pro.min.js"></script>
     <script type="module" src="./js/main.js"></script>
 </body>
 

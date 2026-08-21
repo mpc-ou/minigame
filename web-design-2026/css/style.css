@@ -1,23 +1,23 @@
 :root {
-  --bg-main: #08080f;
-  --bg-card: #111120;
-  --bg-input: #181829;
-  --border-color: #2a2a45;
+  --bg-main: #09070f;
+  --bg-card: rgba(18, 14, 26, 0.88);
+  --bg-input: #151120;
+  --border-color: #352540;
   --accent: #ff7a1a;
   --accent-dark: #2c1400;
   --accent-cyan: #00eaff;
   --accent-purple: #b026ff;
-  --text-primary: #f0f0f7;
-  --text-secondary: #b0b0d6;
+  --text-primary: #f5f3fa;
+  --text-secondary: #b4a8c8;
   --success: #2effa0;
-  --success-bg: #123322;
+  --success-bg: #102e1d;
   --danger: #ff3860;
   --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 8px;
-  --glow-orange: 0 0 14px rgba(255, 122, 26, 0.45);
-  --glow-cyan: 0 0 14px rgba(0, 234, 255, 0.35);
-  --glow-purple: 0 0 16px rgba(176, 38, 255, 0.4);
+  --glow-orange: 0 0 16px rgba(255, 122, 26, 0.6), 0 0 32px rgba(255, 122, 26, 0.25);
+  --glow-cyan: 0 0 14px rgba(0, 234, 255, 0.45);
+  --glow-purple: 0 0 16px rgba(176, 38, 255, 0.45);
 }
 
 * {
@@ -30,11 +30,12 @@ body {
   font-family: 'Montserrat', 'Segoe UI', sans-serif;
   background-color: var(--bg-main);
   background-image:
-    linear-gradient(rgba(0, 234, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 234, 255, 0.07) 1px, transparent 1px),
-    radial-gradient(circle at 15% 0%, rgba(0, 234, 255, 0.09), transparent 42%),
-    radial-gradient(circle at 85% 100%, rgba(176, 38, 255, 0.1), transparent 45%);
-  background-size: 42px 42px, 42px 42px, auto, auto;
+    linear-gradient(rgba(255, 122, 26, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 122, 26, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 15% 0%, rgba(255, 122, 26, 0.16), transparent 48%),
+    radial-gradient(circle at 85% 100%, rgba(255, 69, 0, 0.14), transparent 52%),
+    radial-gradient(circle at 50% 50%, rgba(0, 234, 255, 0.04), transparent 60%);
+  background-size: 38px 38px, 38px 38px, auto, auto, auto;
   animation: grid-drift 2s linear infinite;
   color: var(--text-primary);
   min-height: 100vh;
@@ -43,11 +44,11 @@ body {
 
 @keyframes grid-drift {
   0% {
-    background-position: 0 0, 0 0, 0 0, 0 0;
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
   }
 
   100% {
-    background-position: 42px 42px, 42px 42px, 0 0, 0 0;
+    background-position: 38px 38px, 38px 38px, 0 0, 0 0, 0 0;
   }
 }
 
@@ -60,7 +61,7 @@ body {
 .screen {
   display: none;
   min-height: 100vh;
-  padding: 20px 16px;
+  padding: 10px 4px;
   align-items: center;
   justify-content: center;
 }
@@ -82,4 +83,58 @@ input {
 
 .hidden {
   display: none !important;
+}
+
+/* Ambient Neon Wave Lighting Orbs - Dominant Orange with subtle Cyan accent */
+.bg-wave-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(85px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb-1 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(255, 122, 26, 0.45) 0%, rgba(255, 122, 26, 0) 70%);
+  top: -100px;
+  left: -100px;
+  animation: orb-wave-1 12s ease-in-out infinite alternate;
+}
+
+.orb-2 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(255, 69, 0, 0.4) 0%, rgba(255, 69, 0, 0) 70%);
+  bottom: -110px;
+  right: -110px;
+  animation: orb-wave-2 15s ease-in-out infinite alternate;
+}
+
+.orb-3 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(0, 234, 255, 0.22) 0%, rgba(0, 234, 255, 0) 70%);
+  top: 35%;
+  left: 50%;
+  animation: orb-wave-3 10s ease-in-out infinite alternate;
+}
+
+@keyframes orb-wave-1 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.35; }
+  50% { transform: translate(80px, 60px) scale(1.15); opacity: 0.52; }
+  100% { transform: translate(30px, 120px) scale(0.9); opacity: 0.38; }
+}
+
+@keyframes orb-wave-2 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.32; }
+  50% { transform: translate(-70px, -90px) scale(1.2); opacity: 0.48; }
+  100% { transform: translate(-120px, -40px) scale(0.95); opacity: 0.35; }
+}
+
+@keyframes orb-wave-3 {
+  0% { transform: translate(0, 0) scale(0.85); opacity: 0.15; }
+  50% { transform: translate(-60px, 40px) scale(1.15); opacity: 0.25; }
+  100% { transform: translate(40px, -60px) scale(1); opacity: 0.18; }
 }

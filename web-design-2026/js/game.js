@@ -1,21 +1,50 @@
-import { GRID_SIZE, KEYWORDS, HINT_INTERVAL_MS, HINT_URGENT_THRESHOLD_S, GGFORM_URL, TOPIC } from './config.js';
+import { GRID_SIZE, HINT_INTERVAL_MS, HINT_URGENT_THRESHOLD_S, GGFORM_URL, TOPIC, TEXTS } from './config.js';
 import { generateMatrix } from './matrix.js';
 import { createSelectionManager } from './selection.js';
 import { checkMatch } from './validator.js';
 import { saveState, clearState } from './storage.js';
-import { randomInt, maskWord } from './utils.js';
+import { randomInt, randomLetter, maskWord } from './utils.js';
 import * as anim from './animation.js';
 import { exportResultImage } from './capture.js';
 import { playTapSound, playDeselectSound, playMatchSound, playWinSound, playHintReadySound, playHintRevealSound } from './audio.js';
-import { showModalConfirm } from './modal.js';
+import { showModalConfirm, showModalAlert } from './modal.js';
 
 export function createGame({ dom, state }) {
   let grid = state.grid;
   let placements = state.placements;
-  const foundKeywords = [...state.foundKeywords];
+
+  // Auto-heal: ensure grid is a valid GRID_SIZE x GRID_SIZE matrix
+  if (
+    !grid ||
+    !Array.isArray(grid) ||
+    grid.length !== GRID_SIZE ||
+    !Array.isArray(grid[0]) ||
+    grid[0].length !== GRID_SIZE ||
+    !placements
+  ) {
+    const generated = generateMatrix(state.keywords);
+    grid = generated.grid;
+    placements = generated.placements;
+    state.grid = grid;
+    state.placements = placements;
+    if (!state.keywords || !Array.isArray(state.keywords) || state.keywords.length === 0) {
+      state.keywords = generated.keywords;
+    }
+    saveState(state);
+  }
+
+  const foundKeywords = [...(state.foundKeywords || [])];
   let isReadOnly = state.isWin;
   let infoSubmitted = state.infoSubmitted;
   let exported = state.exported;
+
+  const activeKeywordObjects = state.keywords && state.keywords.length > 0
+    ? state.keywords
+    : Object.keys(placements).map((k) => ({ keyword: k, description: '' }));
+  const activeKeywords = activeKeywordObjects.map((k) => (typeof k === 'string' ? k : k.keyword));
+  const descriptionMap = Object.fromEntries(
+    activeKeywordObjects.map((k) => [typeof k === 'string' ? k : k.keyword, typeof k === 'string' ? '' : (k.description || '')])
+  );
 
   const selectionMgr = createSelectionManager();
   const cellElements = [];
@@ -24,14 +53,17 @@ export function createGame({ dom, state }) {
   let hintTimerId = null;
   let nextHintAt = null;
   let isHintReady = false;
+  let isCometFlying = false;
 
   const cellWordsMap = {};
   Object.entries(placements).forEach(([word, cells]) => {
-    cells.forEach(({ r, c }) => {
-      const key = `${r}_${c}`;
-      if (!cellWordsMap[key]) cellWordsMap[key] = [];
-      cellWordsMap[key].push(word);
-    });
+    if (Array.isArray(cells)) {
+      cells.forEach(({ r, c }) => {
+        const key = `${r}_${c}`;
+        if (!cellWordsMap[key]) cellWordsMap[key] = [];
+        cellWordsMap[key].push(word);
+      });
+    }
   });
 
   function isCellFullyFound(row, col) {
@@ -43,6 +75,7 @@ export function createGame({ dom, state }) {
   function persist() {
     saveState({
       ...state,
+      keywords: activeKeywordObjects,
       foundKeywords,
       hintedWords,
       isWin: isReadOnly,
@@ -58,10 +91,11 @@ export function createGame({ dom, state }) {
     dom.gridEl.style.setProperty('--grid-size', GRID_SIZE);
     for (let r = 0; r < GRID_SIZE; r++) {
       cellElements[r] = [];
+      const row = (grid && grid[r]) || [];
       for (let c = 0; c < GRID_SIZE; c++) {
         const cellEl = document.createElement('div');
         cellEl.className = 'grid-cell';
-        cellEl.textContent = grid[r][c];
+        cellEl.textContent = row[c] || randomLetter();
         cellEl.dataset.row = r;
         cellEl.dataset.col = c;
         cellEl.addEventListener('click', () => onCellClick(r, c, cellEl));
@@ -73,25 +107,43 @@ export function createGame({ dom, state }) {
 
   function renderKeywordList() {
     dom.keywordListEl.innerHTML = '';
-    KEYWORDS.forEach((word) => {
+    activeKeywords.forEach((word) => {
       const chip = document.createElement('span');
+      chip.dataset.keyword = word;
       const isFound = foundKeywords.includes(word);
-      chip.className = 'keyword-chip' + (isFound ? ' found' : '');
+      const isHinted = !!hintedWords[word];
+      const desc = descriptionMap[word] || '';
+
+      chip.className = 'keyword-chip' + (isFound ? ' found' : isHinted ? ' hinted' : ' unhinted');
+
       if (isFound) {
-        chip.textContent = word;
-      } else if (hintedWords[word]) {
-        chip.textContent = hintedWords[word];
-        chip.classList.add('hinted');
+        chip.innerHTML = `<span class="chip-text">${word}</span>`;
+      } else if (isHinted) {
+        chip.innerHTML = `<span class="chip-text">${hintedWords[word]}</span>${desc ? '<i class="fa-solid fa-circle-question chip-hint-icon" title="Bấm xem mô tả"></i>' : ''}`;
       } else {
-        chip.textContent = '_'.repeat(word.length);
+        chip.innerHTML = `<span class="chip-text">${'_'.repeat(word.length)}</span>`;
       }
+
+      if (desc && (isHinted || isFound)) {
+        chip.title = `Gợi ý: ${desc}`;
+        chip.setAttribute('aria-label', `Gợi ý: ${desc}`);
+        chip.classList.add('has-tooltip');
+        chip.addEventListener('click', () => {
+          showModalAlert({
+            title: isFound ? `Từ khóa: ${word}` : `Gợi ý cho từ "${hintedWords[word] || word}"`,
+            message: desc,
+            mascot: isFound ? 'assets/mascot/mascot-cheer.png' : 'assets/mascot/mascot-idle.png',
+            btnText: 'Đã hiểu',
+          });
+        });
+      }
+
       dom.keywordListEl.appendChild(chip);
     });
   }
 
   function renderTopic() {
     if (dom.gameTopicEl) dom.gameTopicEl.textContent = TOPIC;
-    if (dom.coverTopicEl) dom.coverTopicEl.textContent = TOPIC;
   }
 
   function updateHintDisplay() {
@@ -100,7 +152,7 @@ export function createGame({ dom, state }) {
       return;
     }
 
-    const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
+    const unfound = activeKeywords.filter((w) => !foundKeywords.includes(w));
     if (unfound.length === 0) {
       stopHintTimer(true);
       return;
@@ -124,7 +176,7 @@ export function createGame({ dom, state }) {
 
   function startHintTimer() {
     if (isReadOnly) return;
-    const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
+    const unfound = activeKeywords.filter((w) => !foundKeywords.includes(w));
     if (unfound.length === 0) {
       stopHintTimer(true);
       return;
@@ -153,7 +205,7 @@ export function createGame({ dom, state }) {
   }
 
   function tickHintCountdown() {
-    const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
+    const unfound = activeKeywords.filter((w) => !foundKeywords.includes(w));
     if (unfound.length === 0) {
       stopHintTimer(true);
       return;
@@ -172,7 +224,6 @@ export function createGame({ dom, state }) {
 
     const remainingMs = nextHintAt - Date.now();
     if (remainingMs <= 0) {
-      // Countdown completed: hint is now ready to be clicked by player!
       if (hintTimerId) {
         clearInterval(hintTimerId);
         hintTimerId = null;
@@ -195,9 +246,9 @@ export function createGame({ dom, state }) {
   }
 
   function handleHintClick() {
-    if (!isHintReady || isReadOnly) return;
+    if (!isHintReady || isReadOnly || isCometFlying) return;
 
-    const unfound = KEYWORDS.filter((w) => !foundKeywords.includes(w));
+    const unfound = activeKeywords.filter((w) => !foundKeywords.includes(w));
     const notYetHinted = unfound.filter((w) => !hintedWords[w]);
     if (notYetHinted.length === 0) {
       stopHintTimer(false);
@@ -209,50 +260,66 @@ export function createGame({ dom, state }) {
       return;
     }
 
-    // Reveal one hint
-    const word = notYetHinted[randomInt(notYetHinted.length)];
-    hintedWords[word] = maskWord(word);
-    playHintRevealSound();
-    renderKeywordList();
-    persist();
+    const targetWord = notYetHinted[randomInt(notYetHinted.length)];
+    const targetChipEl = dom.keywordListEl.querySelector(`[data-keyword="${targetWord}"]`);
 
-    // Check if more unhinted words remain
-    const remainingUnhinted = unfound.filter((w) => !hintedWords[w]);
-    if (remainingUnhinted.length === 0) {
-      stopHintTimer(false);
-      isHintReady = false;
-      dom.hintCloudEl.classList.remove('ready');
-      dom.mascotHintPopupEl.classList.remove('clickable');
-      dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
-      dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
-    } else {
-      // Start next 30s countdown
-      startHintTimer();
-    }
+    isCometFlying = true;
+    isHintReady = false;
+    dom.hintCloudEl.classList.remove('ready');
+    dom.mascotHintPopupEl.classList.remove('clickable');
+
+    anim.launchCometHint(dom.mascotHintPopupEl, targetChipEl, () => {
+      isCometFlying = false;
+      hintedWords[targetWord] = maskWord(targetWord);
+      playHintRevealSound();
+      renderKeywordList();
+      persist();
+
+      const remainingUnhinted = unfound.filter((w) => w !== targetWord && !hintedWords[w]);
+      if (remainingUnhinted.length === 0) {
+        stopHintTimer(false);
+        isHintReady = false;
+        dom.hintCloudEl.classList.remove('ready');
+        dom.mascotHintPopupEl.classList.remove('clickable');
+        dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+        dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
+      } else {
+        startHintTimer();
+      }
+    });
   }
 
-  function stopHintTimer(hideWidget = true) {
+  function stopHintTimer(hideWidget = false) {
     if (hintTimerId) {
       clearInterval(hintTimerId);
       hintTimerId = null;
     }
     isHintReady = false;
-    if (hideWidget && dom.mascotHintPopupEl) {
-      dom.mascotHintPopupEl.classList.add('hidden');
+    if (dom.mascotHintPopupEl) {
+      if (hideWidget) {
+        dom.mascotHintPopupEl.classList.add('hidden');
+      } else {
+        dom.mascotHintPopupEl.classList.remove('hidden', 'clickable');
+        if (dom.hintCloudEl) dom.hintCloudEl.classList.remove('ready');
+        if (dom.hintMascotEl) dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+        if (dom.hintCloudTextEl) dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
+      }
     }
   }
 
   function renderProgress() {
-    dom.progressEl.textContent = `${foundKeywords.length}/${KEYWORDS.length}`;
+    dom.progressEl.textContent = `${foundKeywords.length}/${activeKeywords.length}`;
   }
 
   function lockFoundCells() {
     foundKeywords.forEach((word) => {
       const cells = placements[word];
-      cells.forEach(({ r, c }) => {
-        cellElements[r][c].classList.add('cell-correct');
-        if (isCellFullyFound(r, c)) cellElements[r][c].classList.add('cell-locked');
-      });
+      if (cells) {
+        cells.forEach(({ r, c }) => {
+          cellElements[r][c].classList.add('cell-correct');
+          if (isCellFullyFound(r, c)) cellElements[r][c].classList.add('cell-locked');
+        });
+      }
     });
   }
 
@@ -327,7 +394,7 @@ export function createGame({ dom, state }) {
       if (!isCellFullyFound(s.row, s.col)) anim.markSelecting(el);
     });
 
-    const matchedWord = checkMatch(selectionWithLetters, foundKeywords);
+    const matchedWord = checkMatch(selectionWithLetters, foundKeywords, activeKeywords);
     if (matchedWord) {
       onKeywordFound(matchedWord, selectionWithLetters);
     }
@@ -352,7 +419,7 @@ export function createGame({ dom, state }) {
     renderProgress();
     persist();
 
-    if (foundKeywords.length === KEYWORDS.length) {
+    if (foundKeywords.length === activeKeywords.length) {
       onWin();
     } else {
       updateHintDisplay();
@@ -387,11 +454,11 @@ export function createGame({ dom, state }) {
 
   function handleInfoSubmit(fullName, studentId) {
     if (!fullName) {
-      showInfoError('Vui lòng nhập họ và tên.');
+      showInfoError(TEXTS.MODALS.INFO_FORM.errNameRequired);
       return;
     }
-    if (!/^\d{10}$/.test(studentId)) {
-      showInfoError('Mã số sinh viên phải gồm đúng 10 chữ số, không chứa chữ cái.');
+    if (!/^\d{7,12}$/.test(studentId)) {
+      showInfoError(TEXTS.MODALS.INFO_FORM.errStudentIdInvalid);
       return;
     }
     state.fullName = fullName;
@@ -425,12 +492,13 @@ export function createGame({ dom, state }) {
     if (isReadOnly) {
       applyReadOnly();
       renderPostWinPanel();
+      stopHintTimer(true);
     } else {
+      if (dom.mascotHintPopupEl) {
+        dom.mascotHintPopupEl.classList.remove('hidden');
+        dom.mascotHintPopupEl.onclick = handleHintClick;
+      }
       startHintTimer();
-    }
-
-    if (dom.mascotHintPopupEl) {
-      dom.mascotHintPopupEl.onclick = handleHintClick;
     }
   }
 
@@ -438,6 +506,7 @@ export function createGame({ dom, state }) {
     init,
     closeVictoryDialog,
     openInfoDialog,
+    closeInfoDialog,
     handleInfoSubmit,
     handleExportAction,
     handleReset,
@@ -445,6 +514,6 @@ export function createGame({ dom, state }) {
   };
 }
 
-export function startNewMatrix() {
-  return generateMatrix();
+export function startNewMatrix(keywordItems = null) {
+  return generateMatrix(keywordItems);
 }

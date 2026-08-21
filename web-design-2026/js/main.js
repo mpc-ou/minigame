@@ -1,14 +1,15 @@
 import { loadState, saveState, clearState, createInitialState } from './storage.js';
 import { startNewMatrix, createGame } from './game.js';
-import { KEYWORDS, TOPIC } from './config.js';
-import { showDialog, hideDialog } from './animation.js';
-import { isSoundEnabled, toggleSound, playCountdownBeep } from './audio.js';
+import { GRID_SIZE, NUMBER_KEYWORD, TOPIC, TEXTS } from './config.js';
+import { showDialog, hideDialog, playIntroCurtainAnimation } from './animation.js';
+import { isSoundEnabled, toggleSound, isMusicEnabled, toggleMusic, playBgm, playCountdownBeep } from './audio.js';
 import { showModalConfirm } from './modal.js';
 
 const coverScreen = document.getElementById('cover-screen');
 const gameScreen = document.getElementById('game-screen');
 const coverStatusEl = document.getElementById('cover-status');
 const guideDialogEl = document.getElementById('guide-dialog');
+const introLoaderEl = document.getElementById('page-intro-loader');
 
 const infoForm = document.getElementById('info-form');
 const infoFullNameInput = infoForm.querySelector('#full-name');
@@ -33,7 +34,7 @@ const dom = {
   infoDialogEl: document.getElementById('info-dialog'),
   infoFormEl: infoForm,
   infoFormErrorEl: document.getElementById('form-error'),
-  coverTopicEl: document.getElementById('cover-topic'),
+  closeInfoBtn: document.getElementById('close-info-btn'),
   gameTopicEl: document.getElementById('game-topic'),
   mascotHintPopupEl: document.getElementById('mascot-hint-popup'),
   hintCloudEl: document.getElementById('hint-cloud'),
@@ -43,14 +44,22 @@ const dom = {
   countdownNumberEl: document.getElementById('countdown-number'),
   soundBtnCover: document.getElementById('sound-btn-cover'),
   soundBtnGame: document.getElementById('sound-btn-game'),
+  musicBtnCover: document.getElementById('music-btn-cover'),
+  musicBtnGame: document.getElementById('music-btn-game'),
 };
 
 function updateSoundButtons(enabled) {
   const iconHtml = enabled
     ? '<i class="fa-solid fa-volume-high"></i>'
     : '<i class="fa-solid fa-volume-xmark"></i>';
-  if (dom.soundBtnCover) dom.soundBtnCover.innerHTML = iconHtml;
-  if (dom.soundBtnGame) dom.soundBtnGame.innerHTML = iconHtml;
+  if (dom.soundBtnCover) {
+    dom.soundBtnCover.classList.toggle('muted', !enabled);
+    dom.soundBtnCover.innerHTML = iconHtml;
+  }
+  if (dom.soundBtnGame) {
+    dom.soundBtnGame.classList.toggle('muted', !enabled);
+    dom.soundBtnGame.innerHTML = iconHtml;
+  }
 }
 
 function setupSoundToggle() {
@@ -63,6 +72,37 @@ function setupSoundToggle() {
   if (dom.soundBtnGame) dom.soundBtnGame.onclick = onToggle;
 }
 
+function updateMusicButtons(enabled) {
+  if (dom.musicBtnCover) {
+    dom.musicBtnCover.classList.toggle('muted', !enabled);
+    dom.musicBtnCover.innerHTML = '<i class="fa-solid fa-music"></i>';
+  }
+  if (dom.musicBtnGame) {
+    dom.musicBtnGame.classList.toggle('muted', !enabled);
+    dom.musicBtnGame.innerHTML = '<i class="fa-solid fa-music"></i>';
+  }
+}
+
+function setupMusicToggle() {
+  updateMusicButtons(isMusicEnabled());
+  const onToggle = () => {
+    const enabled = toggleMusic();
+    updateMusicButtons(enabled);
+  };
+  if (dom.musicBtnCover) dom.musicBtnCover.onclick = onToggle;
+  if (dom.musicBtnGame) dom.musicBtnGame.onclick = onToggle;
+}
+
+function initAutoplayBgm() {
+  const tryStart = () => {
+    if (isMusicEnabled()) {
+      playBgm();
+    }
+  };
+  document.addEventListener('pointerdown', tryStart, { once: true });
+  document.addEventListener('keydown', tryStart, { once: true });
+}
+
 let gameInstance = null;
 
 function launchGame(state) {
@@ -72,6 +112,10 @@ function launchGame(state) {
     document.getElementById('close-victory-btn').onclick = () => gameInstance.closeVictoryDialog();
     dom.saveProofBtn.onclick = () => gameInstance.openInfoDialog();
     dom.exportActionBtn.onclick = () => gameInstance.handleExportAction();
+
+    if (dom.closeInfoBtn) {
+      dom.closeInfoBtn.onclick = () => gameInstance.closeInfoDialog();
+    }
 
     infoForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -121,12 +165,31 @@ function runStartCountdown(onComplete) {
 }
 
 function isValidSavedState(saved) {
+  if (!saved || !saved.grid || !saved.placements || !Array.isArray(saved.foundKeywords)) {
+    return false;
+  }
+  if (
+    !Array.isArray(saved.grid) ||
+    saved.grid.length !== GRID_SIZE ||
+    !Array.isArray(saved.grid[0]) ||
+    saved.grid[0].length !== GRID_SIZE
+  ) {
+    return false;
+  }
+  // Verify all cells are valid non-empty strings
+  for (let r = 0; r < GRID_SIZE; r++) {
+    if (!Array.isArray(saved.grid[r]) || saved.grid[r].length !== GRID_SIZE) return false;
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (!saved.grid[r][c] || typeof saved.grid[r][c] !== 'string') return false;
+    }
+  }
+
+  const keywordsList = Array.isArray(saved.keywords)
+    ? saved.keywords.map((k) => (typeof k === 'string' ? k : k.keyword))
+    : Object.keys(saved.placements);
   return (
-    !!saved &&
-    !!saved.grid &&
-    !!saved.placements &&
-    Array.isArray(saved.foundKeywords) &&
-    KEYWORDS.every((word) => Array.isArray(saved.placements[word])) &&
+    keywordsList.length > 0 &&
+    keywordsList.every((word) => Array.isArray(saved.placements[word])) &&
     saved.foundKeywords.every((word) => Array.isArray(saved.placements[word]))
   );
 }
@@ -135,8 +198,8 @@ function bootstrap() {
   let saved = loadState();
 
   if (!isValidSavedState(saved)) {
-    const { grid, placements } = startNewMatrix();
-    saved = { ...createInitialState(), grid, placements };
+    const { grid, placements, keywords } = startNewMatrix();
+    saved = { ...createInitialState(), grid, placements, keywords };
     saveState(saved);
   }
 
@@ -144,24 +207,31 @@ function bootstrap() {
 }
 
 function renderCoverStatus(saved) {
-  if (dom.coverTopicEl) dom.coverTopicEl.textContent = TOPIC;
+  const totalKeywords = (saved.keywords && saved.keywords.length) || NUMBER_KEYWORD;
   if (saved.isWin) {
-    coverStatusEl.textContent = 'Bạn đã hoàn thành ván trước - bấm Chơi để xem lại kết quả.';
+    coverStatusEl.textContent = TEXTS.COVER.STATUS_WIN;
   } else if (saved.foundKeywords.length > 0) {
-    coverStatusEl.textContent = `Đang chơi dở: ${saved.foundKeywords.length}/${KEYWORDS.length} từ khóa.`;
+    coverStatusEl.textContent = TEXTS.COVER.STATUS_IN_PROGRESS(saved.foundKeywords.length, totalKeywords);
   } else {
-    coverStatusEl.textContent = 'Sẵn sàng bắt đầu.';
+    coverStatusEl.textContent = TEXTS.COVER.STATUS_READY;
   }
 }
 
 const savedState = bootstrap();
 setupSoundToggle();
+setupMusicToggle();
+initAutoplayBgm();
 renderCoverStatus(savedState);
 showScreen(coverScreen);
+
+if (introLoaderEl) {
+  playIntroCurtainAnimation(introLoaderEl);
+}
 
 let isStarting = false;
 document.getElementById('play-btn').onclick = () => {
   if (isStarting) return;
+  playBgm();
 
   if (savedState.isWin) {
     showScreen(gameScreen);
@@ -178,10 +248,10 @@ document.getElementById('play-btn').onclick = () => {
 
 document.getElementById('cover-reset-btn').onclick = async () => {
   const confirmed = await showModalConfirm({
-    title: 'Bắt đầu ván mới?',
-    message: 'Hành động này sẽ xóa toàn bộ tiến trình hiện tại và tạo một ma trận mới.',
-    confirmText: 'Xóa & Bắt đầu lại',
-    cancelText: 'Quay lại',
+    title: TEXTS.MODALS.RESET_CONFIRM.title,
+    message: TEXTS.MODALS.RESET_CONFIRM.message,
+    confirmText: TEXTS.MODALS.RESET_CONFIRM.confirmText,
+    cancelText: TEXTS.MODALS.RESET_CONFIRM.cancelText,
     danger: true,
     mascot: 'assets/mascot/mascot-cry.png',
   });
@@ -190,6 +260,35 @@ document.getElementById('cover-reset-btn').onclick = async () => {
   window.location.reload();
 };
 
-document.getElementById('info-btn-cover').onclick = () => showDialog(guideDialogEl);
-document.getElementById('info-btn-game').onclick = () => showDialog(guideDialogEl);
-document.getElementById('close-guide-btn').onclick = () => hideDialog(guideDialogEl);
+let guideLoaded = false;
+
+async function openGuideDialog() {
+  const guideContentEl = guideDialogEl ? guideDialogEl.querySelector('.guide-content') : null;
+  if (!guideLoaded && guideContentEl) {
+    guideContentEl.innerHTML = '<div class="guide-loading" style="text-align:center; padding: 24px; color: var(--accent);"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 26px; margin-bottom: 10px; display: block;"></i> Đang tải hướng dẫn...</div>';
+    showDialog(guideDialogEl);
+    try {
+      const res = await fetch('content/guide.html');
+      if (res.ok) {
+        const html = await res.text();
+        guideContentEl.innerHTML = html;
+        guideLoaded = true;
+      } else {
+        throw new Error('Fetch failed');
+      }
+    } catch (e) {
+      guideContentEl.innerHTML = TEXTS.DEFAULT_GUIDE_HTML;
+      guideLoaded = true;
+    }
+  } else {
+    showDialog(guideDialogEl);
+  }
+}
+
+const infoBtnCover = document.getElementById('info-btn-cover');
+const infoBtnGame = document.getElementById('info-btn-game');
+const closeGuideBtn = document.getElementById('close-guide-btn');
+
+if (infoBtnCover) infoBtnCover.onclick = openGuideDialog;
+if (infoBtnGame) infoBtnGame.onclick = openGuideDialog;
+if (closeGuideBtn) closeGuideBtn.onclick = () => hideDialog(guideDialogEl);

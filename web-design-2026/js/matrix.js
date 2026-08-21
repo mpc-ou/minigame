@@ -1,4 +1,4 @@
-import { GRID_SIZE, KEYWORDS, DIRECTIONS, MAX_PLACEMENT_ATTEMPTS, MAX_MATRIX_REGENERATE } from './config.js';
+import { GRID_SIZE, DIRECTIONS, MAX_PLACEMENT_ATTEMPTS, MAX_MATRIX_REGENERATE, selectRandomKeywords } from './config.js';
 import { randomLetter, randomInt } from './utils.js';
 
 function createEmptyGrid() {
@@ -42,13 +42,16 @@ function fillRandomLetters(grid) {
   }
 }
 
-export function generateMatrix() {
+export function generateMatrix(keywordItems = null) {
+  const items = keywordItems && keywordItems.length > 0 ? keywordItems : selectRandomKeywords();
+  const words = items.map((it) => (typeof it === 'string' ? it.trim().toUpperCase() : it.keyword.trim().toUpperCase()));
+
   for (let regen = 0; regen < MAX_MATRIX_REGENERATE; regen++) {
     const grid = createEmptyGrid();
     const placements = {};
     let success = true;
 
-    const sortedWords = [...KEYWORDS].sort((a, b) => b.length - a.length);
+    const sortedWords = [...words].sort((a, b) => b.length - a.length);
 
     for (const word of sortedWords) {
       const cells = placeWord(grid, word);
@@ -61,7 +64,7 @@ export function generateMatrix() {
 
     if (success) {
       fillRandomLetters(grid);
-      return { grid, placements };
+      return { grid, placements, keywords: items };
     }
   }
   throw new Error('Không thể sinh ma trận sau nhiều lần thử. Hãy kiểm tra lại danh sách từ khóa.');

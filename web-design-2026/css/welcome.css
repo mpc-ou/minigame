@@ -1,11 +1,13 @@
 .cover-card {
   position: relative;
   width: 100%;
-  max-width: 340px;
+  max-width: 360px;
   background: var(--bg-card);
-  border: 0.5px solid var(--accent-purple);
+  backdrop-filter: blur(12px) brightness(0.85);
+  -webkit-backdrop-filter: blur(12px) brightness(0.85);
+  border: 1px solid var(--accent);
   border-radius: var(--radius-lg);
-  box-shadow: var(--glow-purple);
+  box-shadow: var(--glow-orange);
   padding: 24px 18px;
   text-align: center;
 }
@@ -31,38 +33,73 @@
 .game-topic {
   font-size: 11px;
   font-weight: 600;
-  color: var(--accent-cyan);
-  background: rgba(0, 234, 255, 0.08);
-  border: 0.5px solid rgba(0, 234, 255, 0.3);
+  color: var(--accent);
+  background: rgba(255, 122, 26, 0.12);
+  border: 0.5px solid rgba(255, 122, 26, 0.4);
   padding: 2px 10px;
   border-radius: 20px;
   letter-spacing: 0.5px;
   margin-top: 4px;
   margin-bottom: 4px;
   display: inline-block;
-  box-shadow: 0 0 10px rgba(0, 234, 255, 0.15);
+  box-shadow: 0 0 10px rgba(255, 122, 26, 0.25);
 }
 
-.btn-sound {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 30px;
-  height: 30px;
+.btn-sound,
+.btn-music,
+.btn-info {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top, 14px));
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: var(--bg-input);
-  border: 0.5px solid var(--accent-cyan);
-  color: var(--accent-cyan);
-  font-size: 13px;
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 0.5px solid var(--accent);
+  color: var(--accent);
+  box-shadow: var(--glow-orange);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--glow-cyan);
-  transition: transform 0.15s ease;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  z-index: 90;
 }
 
-.btn-sound:active {
-  transform: scale(0.9);
+.btn-sound {
+  left: max(14px, env(safe-area-inset-left, 14px));
+  font-size: 14px;
+}
+
+.btn-music {
+  left: calc(max(14px, env(safe-area-inset-left, 14px)) + 42px);
+  font-size: 14px;
+}
+
+.btn-info {
+  right: max(14px, env(safe-area-inset-right, 14px));
+  font-size: 15px;
+}
+
+.btn-sound:hover,
+.btn-music:hover,
+.btn-info:hover {
+  transform: scale(1.08);
+}
+
+.btn-sound:active,
+.btn-music:active,
+.btn-info:active {
+  transform: scale(0.92);
+}
+
+.btn-sound.muted,
+.btn-music.muted {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+  box-shadow: none;
+  opacity: 0.65;
 }
 
 .cover-mascot {
