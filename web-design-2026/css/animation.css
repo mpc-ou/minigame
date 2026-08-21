@@ -257,11 +257,12 @@
   border: 2.5px solid #ffffff;
   box-shadow: 0 0 14px #ffd644, 0 0 20px rgba(242, 109, 33, 0.85);
   margin-top: -2px;
+  z-index: 11;
 }
 
 .intro-mascot-container {
   position: absolute;
-  left: 42%;
+  left: calc(50% - 25px);
   bottom: -160px;
   width: 130px;
   height: 130px;
@@ -271,7 +272,7 @@
   transform: translateX(-50%) translateY(0);
   will-change: transform;
   animation: mascot-leap-up 1.6s cubic-bezier(0.2, 1, 0.3, 1) forwards;
-  z-index: 10;
+  z-index: 1;
 }
 
 .intro-mascot-img {
