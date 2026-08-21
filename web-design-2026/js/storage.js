@@ -31,6 +31,7 @@ export function createInitialState() {
     startTime: Date.now(),
     winTime: null,
     isWin: false,
+    keywords: [],
     foundKeywords: [],
     hintedWords: {},
     infoSubmitted: false,

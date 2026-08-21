@@ -106,3 +106,97 @@ export function launchConfetti(canvasEl) {
   }
   requestAnimationFrame(frame);
 }
+
+export function launchCometHint(fromEl, toEl, onArrival) {
+  if (!fromEl || !toEl) {
+    if (onArrival) onArrival();
+    return;
+  }
+
+  const fromRect = fromEl.getBoundingClientRect();
+  const toRect = toEl.getBoundingClientRect();
+
+  const startX = fromRect.left + fromRect.width / 2;
+  const startY = fromRect.top + fromRect.height / 2;
+  const endX = toRect.left + toRect.width / 2;
+  const endY = toRect.top + toRect.height / 2;
+
+  const comet = document.createElement('div');
+  comet.className = 'hint-comet-projectile';
+  comet.innerHTML = '<span class="comet-spark">✨</span><span class="comet-trail"></span>';
+  comet.style.left = `${startX}px`;
+  comet.style.top = `${startY}px`;
+  document.body.appendChild(comet);
+
+  const duration = 500;
+  const startTime = performance.now();
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    const currentX = startX + (endX - startX) * ease;
+    const arcHeight = -45 * Math.sin(progress * Math.PI);
+    const currentY = startY + (endY - startY) * ease + arcHeight;
+
+    comet.style.transform = `translate(${currentX - startX}px, ${currentY - startY}px) scale(${1 + 0.35 * Math.sin(progress * Math.PI)})`;
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      comet.remove();
+      spawnSparkleBurst(endX, endY);
+      toEl.classList.add('keyword-chip-hint-hit');
+      setTimeout(() => toEl.classList.remove('keyword-chip-hint-hit'), 800);
+      if (onArrival) onArrival();
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+function spawnSparkleBurst(x, y) {
+  const container = document.createElement('div');
+  container.className = 'sparkle-burst-container';
+  container.style.left = `${x}px`;
+  container.style.top = `${y}px`;
+
+  for (let i = 0; i < 14; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'sparkle-particle';
+    const angle = (Math.PI * 2 * i) / 14 + (Math.random() - 0.5) * 0.4;
+    const dist = 24 + Math.random() * 32;
+    particle.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+    particle.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+    particle.style.setProperty('--color', CONFETTI_COLORS[i % CONFETTI_COLORS.length]);
+    container.appendChild(particle);
+  }
+
+  document.body.appendChild(container);
+  setTimeout(() => container.remove(), 700);
+}
+
+export function playIntroCurtainAnimation(loaderEl, onComplete) {
+  if (!loaderEl) {
+    if (onComplete) onComplete();
+    return;
+  }
+
+  let completed = false;
+  const startPullCurtain = () => {
+    if (completed) return;
+    completed = true;
+    loaderEl.classList.add('curtain-pulling');
+    setTimeout(() => {
+      loaderEl.classList.add('hidden');
+      if (onComplete) onComplete();
+    }, 850);
+  };
+
+  loaderEl.addEventListener('click', startPullCurtain, { once: true });
+  document.addEventListener('keydown', startPullCurtain, { once: true });
+
+  // Mascot jumps up from bottom to top (~1.6s), then pulls the black screen down
+  setTimeout(startPullCurtain, 1650);
+}
