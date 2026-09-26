@@ -1,22 +1,17 @@
-export const GRID_SIZE = 10;
+export const GRID_SIZE = 9;
 
 export const KEYWORDS_AND_HINTS = [
-  { "keyword": "header", "description": "Phần trên cùng của trang web, thường chứa logo và menu." },
-  { "keyword": "menu", "description": "Danh sách các mục để chọn và chuyển đến những trang khác nhau trên website." },
-  { "keyword": "logo", "description": "Biểu tượng nhận diện thương hiệu của công ty hoặc website." },
-  { "keyword": "banner", "description": "Biểu ngữ hình ảnh lớn, nổi bật, dùng để quảng cáo hoặc truyền tải thông điệp." },
-  { "keyword": "slider", "description": "Khu vực hình ảnh tự động chuyển qua lại, có thể vuốt hoặc bấm mũi tên để xem tiếp." },
-  { "keyword": "search", "description": "Ô tìm kiếm để gõ từ khóa và tra cứu nhanh nội dung." },
-  { "keyword": "button", "description": "Nút bấm để thực hiện một hành động như gửi, mua hàng hoặc đăng nhập." },
-  { "keyword": "link", "description": "Đường dẫn khi bấm vào sẽ mở ra một trang hoặc nội dung khác." },
-  { "keyword": "icon", "description": "Hình biểu tượng nhỏ đại diện cho một chức năng, như hình giỏ hàng hay cái chuông." },
-  { "keyword": "tab", "description": "Các thẻ chuyển đổi giúp xem từng nhóm nội dung khác nhau trên cùng một trang." },
-  { "keyword": "popup", "description": "Cửa sổ nhỏ bất ngờ hiện lên che trên trang để thông báo hoặc mời bạn thao tác." },
-  { "keyword": "form", "description": "Biểu mẫu có các ô để điền thông tin như họ tên, email, số điện thoại." },
-  { "keyword": "avatar", "description": "Ảnh đại diện của một tài khoản hoặc người dùng." },
-  { "keyword": "footer", "description": "Phần cuối cùng của trang web, thường có thông tin liên hệ và bản quyền." }
+  { "keyword": "clinic",   "description": "Doanh nghiệp sức khỏe & làm đẹp: phòng khám, thẩm mỹ viện — một trong 6 lĩnh vực bốc thăm năm nay!" },
+  { "keyword": "school",   "description": "Doanh nghiệp giáo dục & đào tạo: trường, trung tâm dạy học — một trong 6 lĩnh vực bốc thăm năm nay!" },
+  { "keyword": "food",     "description": "Doanh nghiệp ẩm thực: nhà hàng, chuỗi quán ăn — một trong 6 lĩnh vực bốc thăm năm nay!" },
+  { "keyword": "travel",   "description": "Doanh nghiệp du lịch: công ty lữ hành, tour — một trong 6 lĩnh vực bốc thăm năm nay!" },
+  { "keyword": "house",    "description": "Doanh nghiệp bất động sản: dự án nhà ở, căn hộ — một trong 6 lĩnh vực bốc thăm năm nay!" },
+  { "keyword": "software", "description": "Doanh nghiệp phần mềm: giải pháp và sản phẩm công nghệ — một trong 6 lĩnh vực bốc thăm năm nay!" },
+  { "keyword": "fashion",  "description": "Doanh nghiệp thời trang: thương hiệu quần áo, giày dép, phụ kiện." },
+  { "keyword": "photo",    "description": "Doanh nghiệp nhiếp ảnh: studio chụp ảnh cưới, kỷ yếu, sản phẩm." },
+  { "keyword": "game",     "description": "Doanh nghiệp studio game: công ty phát triển trò chơi điện tử." },
+  { "keyword": "sport",    "description": "Doanh nghiệp thể thao: chuỗi phòng tập, cửa hàng dụng cụ thể thao." }
 ];
-
 export const NUMBER_KEYWORD = 5;
 
 export function selectRandomKeywords(count = NUMBER_KEYWORD) {
