@@ -5,7 +5,7 @@
 export const TEXTS = {
   GAME_NAME: 'Word Hunt Game',
   COMPETITION_NAME: 'WEB-DESIGN 2026',
-  TOPIC: 'Chủ đề: Thành phần Giao diện Web (UI/UX)',
+  TOPIC: 'Chủ đề: Lĩnh vực kinh doanh (tiếng Anh)',
 
   COVER: {
     STATUS_WIN: 'Bạn đã hoàn thành ván trước - bấm Chơi để xem lại kết quả.',
