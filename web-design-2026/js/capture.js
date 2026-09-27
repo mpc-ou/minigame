@@ -1,6 +1,14 @@
-import { GAME_NAME, COMPETITION_NAME, TOPIC, GRID_SIZE } from './config.js';
+import { GAME_NAME, TOPIC, GRID_SIZE } from './config.js';
 import { formatDateTime, generateHash } from './utils.js';
 import { showModalAlert } from './modal.js';
+
+const CAPTURE_BG = 'assets/bg.jpg';
+
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[ch]));
+}
 
 function buildCaptureCard(state, grid, placements) {
   const card = document.createElement('div');
@@ -29,58 +37,54 @@ function buildCaptureCard(state, grid, placements) {
     ? state.keywords.map(k => typeof k === 'string' ? k : k.keyword)
     : Object.keys(placements);
 
-  const keywordsHtml = keywordsList.map((w) => `<span class="capture-chip"><i class="fa-solid fa-check"></i> ${w}</span>`).join('');
+  const topic = TOPIC.replace(/^Chủ đề:\s*/i, '');
 
   card.innerHTML = `
-    <div class="capture-frame">
-      <div class="capture-corner top-left"></div>
-      <div class="capture-corner top-right"></div>
-      <div class="capture-corner bottom-left"></div>
-      <div class="capture-corner bottom-right"></div>
-
-      <div class="capture-header">
-        <img src="assets/logo/logo.png" alt="Logo CLB Lập Trình Trên Thiết Bị Di Động" class="capture-logo" />
-        <div class="capture-header-text">
-          <p class="capture-title">${GAME_NAME}</p>
-          <p class="capture-competition">${COMPETITION_NAME}</p>
-          <p class="capture-topic">${TOPIC}</p>
-        </div>
-        <div class="capture-badge">
-          <span class="badge-text">VERIFIED</span>
-          <span class="badge-sub">100% COMPLETE</span>
-        </div>
+    <img src="${CAPTURE_BG}" alt="" class="capture-bg" />
+    <div class="capture-content">
+      <div class="capture-heading">
+        <p class="capture-title">MINIGAME</p>
+        <p class="capture-subtitle">
+          <span class="capture-subtitle-line"></span>
+          <span>${escapeHtml(topic)}</span>
+          <span class="capture-subtitle-line"></span>
+        </p>
       </div>
 
-      <div class="capture-info-panel">
-        <div class="capture-info-item">
-          <span class="info-label">Họ và tên:</span>
-          <span class="info-value highlight">${state.fullName}</span>
+      <div class="capture-board">
+        <div class="capture-board-head">
+          <span class="capture-board-name">${escapeHtml(GAME_NAME)}</span>
+          <span class="capture-badge"><i class="fa-solid fa-circle-check"></i> ${keywordsList.length}/${keywordsList.length}</span>
         </div>
-        <div class="capture-info-item">
-          <span class="info-label">Mã số sinh viên:</span>
-          <span class="info-value highlight">${state.studentId}</span>
-        </div>
-        <div class="capture-info-item">
-          <span class="info-label">Thời gian hoàn thành:</span>
-          <span class="info-value">${winTimeStr}</span>
-        </div>
+        ${gridHtml}
       </div>
 
-      <div class="capture-keywords">${keywordsHtml}</div>
-      ${gridHtml}
-
-      <div class="capture-footer">
-        <div class="capture-security-code">
-          <span class="security-label">MÃ XÁC THỰC:</span>
-          <span class="security-hash">#${hash}</span>
-        </div>
-        <span class="capture-watermark">CLB Lập Trình Trên Thiết Bị Di Động &middot; MPC</span>
+      <div class="capture-player">
+        <p class="capture-name">${escapeHtml(state.fullName)}</p>
+        <p class="capture-meta">
+          <span>MSSV ${escapeHtml(state.studentId)}</span>
+          <span class="capture-dot">&bull;</span>
+          <span>${winTimeStr}</span>
+          <span class="capture-dot">&bull;</span>
+          <span class="capture-hash">#${hash}</span>
+        </p>
       </div>
     </div>
   `;
 
   document.body.appendChild(card);
   return card;
+}
+
+async function waitForImages(root) {
+  const imgs = Array.from(root.querySelectorAll('img'));
+  await Promise.all(imgs.map((img) => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      img.addEventListener('load', resolve, { once: true });
+      img.addEventListener('error', () => reject(new Error(`Không tải được ảnh ${img.getAttribute('src')}`)), { once: true });
+    });
+  }));
 }
 
 // Ten file dang "Minigame-Ho_Ten-MSSV.png", bo ky tu khong an toan cho ten file
@@ -109,8 +113,11 @@ export async function exportResultImage(state, grid, placements, exportBtn) {
     }
 
     card = buildCaptureCard(state, grid, placements);
+    await waitForImages(card);
     const canvas = await h2c(card, {
-      backgroundColor: '#0d0d14',
+      backgroundColor: '#0a0706',
+      width: 540,
+      height: 720,
       scale: 2,
       useCORS: true,
     });
