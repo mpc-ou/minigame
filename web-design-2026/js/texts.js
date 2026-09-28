@@ -49,6 +49,11 @@ export const TEXTS = {
       message: 'Không thể tự động tải file ảnh về máy.\n\nVui lòng chụp màn hình ảnh minh chứng đang hiển thị để lưu kết quả nhé!',
       btnText: 'Đã hiểu, xem ảnh',
     },
+    SUBMIT_PROOF_NOTICE: {
+      title: 'Lưu ý nộp minh chứng',
+      message: 'Đảm bảo bạn đã up kết quả minigame lên story trên FB cá nhân của bạn. Và chụp màn hình lại nhé. Minh chứng cần nộp là ảnh chụp màn hình story kết quả minigame của bạn á!',
+      btnText: 'Đã hiểu',
+    },
   },
 
   POST_WIN: {

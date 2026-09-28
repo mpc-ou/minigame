@@ -30,6 +30,13 @@ export function showModalAlert(options) {
     btn.textContent = btnText;
     btn.onclick = () => {
       hideDialog(modalEl);
+      if (typeof options === 'object' && typeof options.onConfirm === 'function') {
+        try {
+          options.onConfirm();
+        } catch (err) {
+          console.error(err);
+        }
+      }
       resolve();
     };
 
