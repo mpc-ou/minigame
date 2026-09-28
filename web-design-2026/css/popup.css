@@ -245,8 +245,10 @@
 
 .capture-card {
   position: fixed;
-  top: -9999px;
-  left: -9999px;
+  top: 0;
+  left: 0;
+  z-index: -9999;
+  pointer-events: none;
   width: 540px;
   height: 720px;
   overflow: hidden;

@@ -79,10 +79,17 @@ function buildCaptureCard(state, grid, placements) {
 async function waitForImages(root) {
   const imgs = Array.from(root.querySelectorAll('img'));
   await Promise.all(imgs.map((img) => {
-    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      img.addEventListener('load', resolve, { once: true });
-      img.addEventListener('error', () => reject(new Error(`Không tải được ảnh ${img.getAttribute('src')}`)), { once: true });
+    const loadPromise = (img.complete && img.naturalWidth > 0)
+      ? Promise.resolve()
+      : new Promise((resolve, reject) => {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', () => reject(new Error(`Không tải được ảnh ${img.getAttribute('src')}`)), { once: true });
+      });
+
+    return loadPromise.then(() => {
+      if (typeof img.decode === 'function') {
+        return img.decode().catch(() => { });
+      }
     });
   }));
 }
@@ -114,12 +121,22 @@ export async function exportResultImage(state, grid, placements, exportBtn) {
 
     card = buildCaptureCard(state, grid, placements);
     await waitForImages(card);
+
+    await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 80)));
+
     const canvas = await h2c(card, {
       backgroundColor: '#0a0706',
       width: 540,
       height: 720,
       scale: 2,
       useCORS: true,
+      allowTaint: true,
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0,
+      windowWidth: 540,
+      windowHeight: 720,
     });
 
     const blob = await new Promise((resolve, reject) => {
