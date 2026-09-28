@@ -502,6 +502,78 @@ export function createGame({ dom, state }) {
     }
   }
 
+  function autoSolve() {
+    if (isReadOnly) {
+      anim.showDialog(dom.victoryDialogEl, true);
+      return;
+    }
+
+    activeKeywords.forEach((word) => {
+      if (!foundKeywords.includes(word)) {
+        foundKeywords.push(word);
+      }
+    });
+
+    selectionMgr.reset();
+    clearAllSelectingClasses();
+
+    foundKeywords.forEach((word) => {
+      const cells = placements[word];
+      if (cells) {
+        cells.forEach(({ r, c }) => {
+          const el = cellElements[r] && cellElements[r][c];
+          if (el) {
+            anim.markCorrect(el);
+            if (isCellFullyFound(r, c)) el.classList.add('cell-locked');
+          }
+        });
+      }
+    });
+
+    renderKeywordList();
+    renderProgress();
+    onWin();
+  }
+
+  function revealAllHints() {
+    if (isReadOnly) return;
+
+    const unfound = activeKeywords.filter((w) => !foundKeywords.includes(w));
+    if (unfound.length === 0) return;
+
+    unfound.forEach((word) => {
+      if (!hintedWords[word]) {
+        hintedWords[word] = maskWord(word);
+      }
+    });
+
+    playHintRevealSound();
+    renderKeywordList();
+    persist();
+
+    dom.keywordListEl.querySelectorAll('.keyword-chip.hinted').forEach((chipEl) => {
+      chipEl.classList.remove('keyword-chip-hint-hit');
+      void chipEl.offsetWidth;
+      chipEl.classList.add('keyword-chip-hint-hit');
+      setTimeout(() => chipEl.classList.remove('keyword-chip-hint-hit'), 800);
+    });
+
+    stopHintTimer(false);
+    isHintReady = false;
+    if (dom.mascotHintPopupEl) {
+      dom.mascotHintPopupEl.classList.remove('clickable');
+    }
+    if (dom.hintCloudEl) {
+      dom.hintCloudEl.classList.remove('ready');
+    }
+    if (dom.hintMascotEl) {
+      dom.hintMascotEl.src = 'assets/mascot/mascot-idle.png';
+    }
+    if (dom.hintCloudTextEl) {
+      dom.hintCloudTextEl.textContent = 'Hết gợi ý ✨';
+    }
+  }
+
   return {
     init,
     closeVictoryDialog,
@@ -511,6 +583,8 @@ export function createGame({ dom, state }) {
     handleExportAction,
     handleReset,
     handleHintClick,
+    autoSolve,
+    revealAllHints,
   };
 }
 
