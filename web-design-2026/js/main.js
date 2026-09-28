@@ -30,6 +30,9 @@ const dom = {
   postWinStatusEl: document.getElementById('post-win-status'),
   saveProofBtn: document.getElementById('save-proof-btn'),
   exportActionBtn: document.getElementById('export-action-btn'),
+  cannotExportBtn: document.getElementById('cannot-export-btn'),
+  proofDialogEl: document.getElementById('proof-dialog'),
+  proofImgEl: document.getElementById('proof-image'),
   ggformLinkEl: document.getElementById('ggform-link'),
   infoDialogEl: document.getElementById('info-dialog'),
   infoFormEl: infoForm,
@@ -157,6 +160,9 @@ function launchGame(state) {
     document.getElementById('close-victory-btn').onclick = () => gameInstance.closeVictoryDialog();
     dom.saveProofBtn.onclick = () => gameInstance.openInfoDialog();
     dom.exportActionBtn.onclick = () => gameInstance.handleExportAction();
+    if (dom.cannotExportBtn) {
+      dom.cannotExportBtn.onclick = () => gameInstance.handleCannotExportAction();
+    }
 
     if (dom.closeInfoBtn) {
       dom.closeInfoBtn.onclick = () => gameInstance.closeInfoDialog();
@@ -338,3 +344,7 @@ const closeGuideBtn = document.getElementById('close-guide-btn');
 if (infoBtnCover) infoBtnCover.onclick = openGuideDialog;
 if (infoBtnGame) infoBtnGame.onclick = openGuideDialog;
 if (closeGuideBtn) closeGuideBtn.onclick = () => hideDialog(guideDialogEl);
+
+console.log("Ồ! Bạn cũng là người thích lập trình à!")
+console.log("Chỉ bạn mẹo này: Nhấn 5 lần vào icon loa sẽ hack được game đấy!")
+console.log("Nếu không tin thì nhấn thử đi :)")

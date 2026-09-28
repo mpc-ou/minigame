@@ -106,6 +106,9 @@
                 <button id="export-action-btn" class="btn-export btn-cta-pulse hidden">
                     <i class="fa-solid fa-download"></i> Xuất ảnh
                 </button>
+                <button id="cannot-export-btn" class="btn-cannot-export hidden">
+                    <i class="fa-solid fa-circle-question"></i> Không xuất ảnh được
+                </button>
                 <a id="ggform-link" class="btn-ggform hidden" target="_blank" rel="noopener">
                     <i class="fa-solid fa-paper-plane"></i> Nộp minh chứng
                 </a>
@@ -149,6 +152,11 @@
             <p id="custom-modal-text" class="dialog-text">Nội dung thông báo</p>
             <div id="custom-modal-actions" class="dialog-actions modal-actions"></div>
         </div>
+    </div>
+
+    <!-- Proof Image Full Preview (No frame, tap black background to close) -->
+    <div id="proof-dialog" class="dialog-overlay proof-overlay hidden">
+        <img id="proof-image" src="" alt="Ảnh minh chứng hoàn thành" class="proof-full-img" />
     </div>
 
     <div id="guide-dialog" class="dialog-overlay hidden">
