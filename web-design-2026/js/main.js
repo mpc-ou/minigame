@@ -1,8 +1,8 @@
 import { loadState, saveState, clearState, createInitialState } from './storage.js';
 import { startNewMatrix, createGame } from './game.js';
-import { GRID_SIZE, NUMBER_KEYWORD, TOPIC, TEXTS } from './config.js';
+import { GRID_SIZE, NUMBER_KEYWORD, TOPIC, TEXTS, TEST_MODE } from './config.js';
 import { showDialog, hideDialog, playIntroCurtainAnimation } from './animation.js';
-import { isSoundEnabled, toggleSound, isMusicEnabled, toggleMusic, playBgm, playCountdownBeep } from './audio.js';
+import { isSoundEnabled, toggleSound, setSoundEnabled, isMusicEnabled, toggleMusic, playBgm, playCountdownBeep } from './audio.js';
 import { showModalConfirm } from './modal.js';
 
 const coverScreen = document.getElementById('cover-screen');
@@ -91,6 +91,51 @@ function setupMusicToggle() {
   };
   if (dom.musicBtnCover) dom.musicBtnCover.onclick = onToggle;
   if (dom.musicBtnGame) dom.musicBtnGame.onclick = onToggle;
+}
+
+function setupTestModeCheats() {
+  if (typeof TEST_MODE === 'undefined' || TEST_MODE !== true) {
+    return;
+  }
+
+  function createClickTracker(targetCount, windowMs, callback) {
+    let clicks = [];
+    return function () {
+      const now = Date.now();
+      clicks = clicks.filter((t) => now - t <= windowMs);
+      clicks.push(now);
+      if (clicks.length >= targetCount) {
+        clicks = [];
+        callback();
+      }
+    };
+  }
+
+  if (dom.soundBtnGame) {
+    const handleSoundCheat = createClickTracker(5, 5000, () => {
+      setSoundEnabled(true);
+      updateSoundButtons(true);
+      if (!gameInstance) {
+        launchGame(savedState);
+      }
+      if (gameInstance && typeof gameInstance.autoSolve === 'function') {
+        gameInstance.autoSolve();
+      }
+    });
+    dom.soundBtnGame.addEventListener('click', handleSoundCheat);
+  }
+
+  if (dom.musicBtnGame) {
+    const handleMusicCheat = createClickTracker(5, 5000, () => {
+      if (!gameInstance) {
+        launchGame(savedState);
+      }
+      if (gameInstance && typeof gameInstance.revealAllHints === 'function') {
+        gameInstance.revealAllHints();
+      }
+    });
+    dom.musicBtnGame.addEventListener('click', handleMusicCheat);
+  }
 }
 
 function initAutoplayBgm() {
@@ -220,6 +265,7 @@ function renderCoverStatus(saved) {
 const savedState = bootstrap();
 setupSoundToggle();
 setupMusicToggle();
+setupTestModeCheats();
 initAutoplayBgm();
 renderCoverStatus(savedState);
 showScreen(coverScreen);
