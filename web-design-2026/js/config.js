@@ -4,7 +4,7 @@ export const GRID_SIZE = 9;
 // Khi TEST_MODE = true:
 // - Click sound-btn-game 5 lần trong 5s: tự động giải toàn bộ minigame để chiến thắng
 // - Click music-btn-game 5 lần trong 5s: mở khóa toàn bộ gợi ý từ khóa
-export const TEST_MODE = true;
+export const TEST_MODE = false;
 
 export const KEYWORDS_AND_HINTS = [
   { "keyword": "clinic", "description": "Doanh nghiệp sức khỏe & làm đẹp: phòng khám, thẩm mỹ viện — một trong 6 lĩnh vực bốc thăm năm nay!" },
