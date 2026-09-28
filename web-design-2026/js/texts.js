@@ -39,6 +39,16 @@ export const TEXTS = {
       errNameRequired: 'Vui lòng nhập họ và tên.',
       errStudentIdInvalid: 'Mã số sinh viên phải gồm từ 7 đến 12 chữ số, không chứa chữ cái.',
     },
+    FB_BROWSER_ALERT: {
+      title: 'Vui lòng chụp màn hình',
+      message: 'Trình duyệt Facebook không hỗ trợ tự động tải ảnh về máy.\n\nVui lòng chụp màn hình ảnh minh chứng để lưu kết quả nhé!',
+      btnText: 'Đã hiểu, xem ảnh',
+    },
+    EXPORT_FALLBACK_ALERT: {
+      title: 'Vui lòng chụp màn hình',
+      message: 'Không thể tự động tải file ảnh về máy.\n\nVui lòng chụp màn hình ảnh minh chứng đang hiển thị để lưu kết quả nhé!',
+      btnText: 'Đã hiểu, xem ảnh',
+    },
   },
 
   POST_WIN: {
@@ -46,7 +56,8 @@ export const TEXTS = {
     SAVED_SUCCESS: 'Đã lưu kết quả thành công! Bạn có thể xuất lại ảnh hoặc nộp form bên dưới.',
     BTN_SAVE_PROOF: 'Lưu minh chứng',
     BTN_EXPORT_IMAGE: 'Xuất ảnh',
-    BTN_EXPORTED_IMAGE: 'Đã xuất ảnh',
+    BTN_EXPORTED_IMAGE: 'Xuất ảnh lại',
+    BTN_VIEW_PROOF: 'Xem ảnh minh chứng',
     BTN_GGFORM: 'Nộp minh chứng (Google Form)',
     BTN_PLAY_AGAIN: 'Xóa kết quả / Chơi lại',
   },

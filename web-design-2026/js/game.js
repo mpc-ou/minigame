@@ -5,7 +5,7 @@ import { checkMatch } from './validator.js';
 import { saveState, clearState } from './storage.js';
 import { randomInt, randomLetter, maskWord } from './utils.js';
 import * as anim from './animation.js';
-import { exportResultImage } from './capture.js';
+import { exportResultImage, generateProofImage, openProofDialog, getCachedProof } from './capture.js';
 import { playTapSound, playDeselectSound, playMatchSound, playWinSound, playHintReadySound, playHintRevealSound } from './audio.js';
 import { showModalConfirm, showModalAlert } from './modal.js';
 
@@ -37,6 +37,7 @@ export function createGame({ dom, state }) {
   let isReadOnly = state.isWin;
   let infoSubmitted = state.infoSubmitted;
   let exported = state.exported;
+  let exportClicked = Boolean(state.exportClicked || state.exported);
 
   const activeKeywordObjects = state.keywords && state.keywords.length > 0
     ? state.keywords
@@ -81,6 +82,7 @@ export function createGame({ dom, state }) {
       isWin: isReadOnly,
       infoSubmitted,
       exported,
+      exportClicked,
       grid,
       placements,
     });
@@ -335,6 +337,7 @@ export function createGame({ dom, state }) {
     dom.postWinPanelEl.classList.remove('hidden');
     dom.saveProofBtn.classList.add('hidden');
     dom.exportActionBtn.classList.add('hidden');
+    if (dom.cannotExportBtn) dom.cannotExportBtn.classList.add('hidden');
     dom.ggformLinkEl.classList.add('hidden');
 
     if (!infoSubmitted) {
@@ -350,6 +353,11 @@ export function createGame({ dom, state }) {
     dom.exportActionBtn.innerHTML = exported
       ? '<i class="fa-solid fa-download"></i> Xuất ảnh lại'
       : '<i class="fa-solid fa-download"></i> Xuất ảnh';
+
+    // Chỉ hiện nút Không xuất ảnh được khi đã nhấn nút xuất ảnh ít nhất 1 lần
+    if (dom.cannotExportBtn) {
+      dom.cannotExportBtn.classList.toggle('hidden', !exportClicked);
+    }
 
     if (exported && GGFORM_URL) {
       dom.ggformLinkEl.href = GGFORM_URL;
@@ -475,11 +483,57 @@ export function createGame({ dom, state }) {
   }
 
   async function handleExportAction() {
-    const success = await exportResultImage(state, grid, placements, dom.exportActionBtn);
+    exportClicked = true;
+    state.exportClicked = true;
+    persist();
+    renderPostWinPanel();
+
+    const success = await exportResultImage(state, grid, placements, dom.exportActionBtn, dom);
     if (success) {
       exported = true;
       persist();
       renderPostWinPanel();
+    }
+  }
+
+  async function handleCannotExportAction() {
+    const origHtml = dom.cannotExportBtn ? dom.cannotExportBtn.innerHTML : '';
+    if (dom.cannotExportBtn) {
+      dom.cannotExportBtn.disabled = true;
+      dom.cannotExportBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tải ảnh...';
+    }
+
+    let proof = getCachedProof();
+    if (!proof || !proof.dataUrl) {
+      const res = await generateProofImage(state, grid, placements);
+      if (res.success) {
+        proof = res;
+      }
+    }
+
+    if (dom.cannotExportBtn) {
+      dom.cannotExportBtn.disabled = false;
+      dom.cannotExportBtn.innerHTML = origHtml;
+    }
+
+    if (proof && (proof.dataUrl || proof.blobUrl)) {
+      exported = true;
+      state.exported = true;
+      persist();
+      renderPostWinPanel();
+
+      await openProofDialog(dom, proof, {
+        showAlert: true,
+        alertTitle: TEXTS.MODALS.FB_BROWSER_ALERT.title,
+        alertMessage: TEXTS.MODALS.FB_BROWSER_ALERT.message,
+      });
+    } else {
+      await showModalAlert({
+        title: 'Lỗi xuất ảnh',
+        message: 'Không thể tạo ảnh minh chứng. Vui lòng chụp màn hình giao diện hiện tại để làm minh chứng!',
+        mascot: 'assets/mascot/mascot-cry.png',
+        btnText: 'Đã hiểu',
+      });
     }
   }
 
@@ -581,6 +635,7 @@ export function createGame({ dom, state }) {
     closeInfoDialog,
     handleInfoSubmit,
     handleExportAction,
+    handleCannotExportAction,
     handleReset,
     handleHintClick,
     autoSolve,

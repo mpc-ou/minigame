@@ -1,8 +1,39 @@
 import { GAME_NAME, TOPIC, GRID_SIZE } from './config.js';
 import { formatDateTime, generateHash } from './utils.js';
 import { showModalAlert } from './modal.js';
+import { showDialog, hideDialog } from './animation.js';
+import { TEXTS } from './texts.js';
 
 const CAPTURE_BG = 'assets/bg.jpg';
+
+let cachedProofData = null;
+
+export function getCachedProof() {
+  return cachedProofData;
+}
+
+export function setCachedProof(data) {
+  cachedProofData = data;
+}
+
+export function isFBOrInAppBrowser() {
+  if (typeof window !== 'undefined' && window.location.search.includes('fb=1')) {
+    return true;
+  }
+  const ua = (navigator.userAgent || navigator.vendor || window.opera || '').toLowerCase();
+  return (
+    ua.includes('fban') ||
+    ua.includes('fbav') ||
+    ua.includes('fb_iab') ||
+    ua.includes('fb4a') ||
+    ua.includes('fbios') ||
+    ua.includes('messenger') ||
+    ua.includes('instagram') ||
+    ua.includes('zalo') ||
+    ua.includes('tiktok') ||
+    ua.includes('line')
+  );
+}
 
 function escapeHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, (ch) => ({
@@ -94,8 +125,7 @@ async function waitForImages(root) {
   }));
 }
 
-// Ten file dang "Minigame-Ho_Ten-MSSV.png", bo ky tu khong an toan cho ten file
-function buildFileName(state) {
+export function buildFileName(state) {
   const namePart = (state.fullName || 'Player')
     .trim()
     .replace(/\s+/g, '_')
@@ -103,16 +133,15 @@ function buildFileName(state) {
   return `Minigame-${namePart}-${state.studentId}.png`;
 }
 
-export async function exportResultImage(state, grid, placements, exportBtn) {
-  const originalHTML = exportBtn ? exportBtn.innerHTML : '';
-  if (exportBtn) {
-    exportBtn.disabled = true;
-    exportBtn.textContent = 'Đang tạo ảnh...';
-  }
-
-  let card;
+export async function generateProofImage(state, grid, placements) {
+  let card = null;
   try {
-    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    if (document.fonts && document.fonts.ready) {
+      await Promise.race([
+        document.fonts.ready,
+        new Promise((resolve) => setTimeout(resolve, 1500)),
+      ]);
+    }
 
     const h2c = typeof html2canvas === 'function' ? html2canvas : (window.html2canvas || (window.html2canvas && window.html2canvas.default));
     if (!h2c) {
@@ -139,33 +168,130 @@ export async function exportResultImage(state, grid, placements, exportBtn) {
       windowHeight: 720,
     });
 
-    const blob = await new Promise((resolve, reject) => {
-      canvas.toBlob((b) => {
-        if (b) resolve(b);
-        else reject(new Error('canvas.toBlob trả về null'));
-      }, 'image/png');
-    });
+    const dataUrl = canvas.toDataURL('image/png');
+    let blob = null;
+    let blobUrl = null;
+    try {
+      blob = await new Promise((resolve, reject) => {
+        canvas.toBlob((b) => {
+          if (b) resolve(b);
+          else reject(new Error('canvas.toBlob trả về null'));
+        }, 'image/png');
+      });
+      if (blob) {
+        blobUrl = URL.createObjectURL(blob);
+      }
+    } catch (_) { }
 
-    const blobUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = buildFileName(state);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    const proofData = { dataUrl, blob, blobUrl, state };
+    setCachedProof(proofData);
+    return { success: true, ...proofData };
+  } catch (err) {
+    console.error('generateProofImage lỗi:', err);
+    return { success: false, error: err, state };
+  } finally {
+    if (card) card.remove();
+  }
+}
+
+export async function openProofDialog(dom, proofData, { showAlert = false, alertTitle, alertMessage } = {}) {
+  if (!dom || !dom.proofDialogEl) return;
+
+  if (dom.proofImgEl) {
+    dom.proofImgEl.src = proofData.dataUrl || proofData.blobUrl || '';
+    dom.proofImgEl.onclick = (e) => {
+      e.stopPropagation();
+    };
+  }
+
+  // Bấm nền đen (phần ngoài ảnh) sẽ lặn đi
+  dom.proofDialogEl.onclick = (e) => {
+    if (e.target !== dom.proofImgEl) {
+      hideDialog(dom.proofDialogEl);
+    }
+  };
+
+  // Show the proof dialog with image on screen
+  showDialog(dom.proofDialogEl);
+
+  // If showAlert requested, display the alert modal on top
+  if (showAlert) {
+    await showModalAlert({
+      title: alertTitle || TEXTS.MODALS.FB_BROWSER_ALERT.title,
+      message: alertMessage || TEXTS.MODALS.FB_BROWSER_ALERT.message,
+      mascot: 'assets/mascot/mascot-idle.png',
+      btnText: 'Đã hiểu, xem ảnh',
+    });
+  }
+}
+
+export async function exportResultImage(state, grid, placements, exportBtn, dom) {
+  const originalHTML = exportBtn ? exportBtn.innerHTML : '';
+  if (exportBtn) {
+    exportBtn.disabled = true;
+    exportBtn.textContent = 'Đang tạo ảnh...';
+  }
+
+  try {
+    const proofResult = await generateProofImage(state, grid, placements);
+    if (!proofResult.success) {
+      await showModalAlert({
+        title: 'Lỗi xuất ảnh',
+        message: 'Không thể tạo ảnh minh chứng: ' + (proofResult.error?.message || 'Lỗi không xác định') + '. Vui lòng chụp màn hình giao diện hiện tại để làm minh chứng!',
+        mascot: 'assets/mascot/mascot-cry.png',
+        btnText: 'Đã hiểu',
+      });
+      return false;
+    }
+
+    const inApp = isFBOrInAppBrowser();
+
+    if (inApp && dom && dom.proofDialogEl) {
+      // In Facebook / In-App browser: file download is blocked
+      // Show proof dialog on screen + alert asking user to screenshot!
+      await openProofDialog(dom, proofResult, {
+        showAlert: true,
+        alertTitle: TEXTS.MODALS.FB_BROWSER_ALERT.title,
+        alertMessage: TEXTS.MODALS.FB_BROWSER_ALERT.message,
+      });
+      return true;
+    }
+
+    // Normal browser: try direct download
+    let downloadSucceeded = false;
+    try {
+      const link = document.createElement('a');
+      link.href = proofResult.blobUrl || proofResult.dataUrl;
+      link.download = buildFileName(state);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      downloadSucceeded = true;
+    } catch (dlErr) {
+      console.warn('Auto download failed:', dlErr);
+      downloadSucceeded = false;
+    }
+
+    if (!downloadSucceeded && dom && dom.proofDialogEl) {
+      await openProofDialog(dom, proofResult, {
+        showAlert: true,
+        alertTitle: TEXTS.MODALS.EXPORT_FALLBACK_ALERT.title,
+        alertMessage: TEXTS.MODALS.EXPORT_FALLBACK_ALERT.message,
+      });
+      return true;
+    }
+
     return true;
   } catch (err) {
+    console.error('exportResultImage unexpected error:', err);
     await showModalAlert({
       title: 'Lỗi xuất ảnh',
       message: 'Không thể tạo ảnh minh chứng: ' + err.message,
       mascot: 'assets/mascot/mascot-cry.png',
       btnText: 'Đóng',
     });
-    console.error('exportResultImage lỗi:', err);
     return false;
   } finally {
-    if (card) card.remove();
     if (exportBtn) {
       exportBtn.disabled = false;
       exportBtn.innerHTML = originalHTML;
