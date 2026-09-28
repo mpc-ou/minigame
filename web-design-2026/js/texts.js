@@ -77,9 +77,11 @@ export const TEXTS = {
 </ol>
 <h3>Lưu &amp; nộp minh chứng</h3>
 <ol>
-    <li>Sau khi thắng, bấm <strong>"Lưu minh chứng"</strong> và nhập đúng Họ tên + Mã số sinh viên (chỉ nhập được 1 lần cho mỗi lượt chơi, nên gõ cẩn thận).</li>
-    <li>Bấm <strong>"Xuất ảnh"</strong> để tải ảnh minh chứng (định dạng PNG) về máy - có thể bấm xuất lại bất cứ lúc nào nếu lỡ làm mất ảnh.</li>
-    <li>Nếu màn hình có nút <strong>"Nộp minh chứng"</strong>, bấm vào để nộp trực tiếp qua Google Form của CLB. Nếu chưa thấy nút này, hãy gửi ảnh minh chứng (kèm Họ tên, MSSV) cho Ban tổ chức CLB Lập Trình Trên Thiết Bị Di Động qua kênh liên hệ chính thức để được cộng điểm rèn luyện (DRL).</li>
+    <li>Sau khi thắng, bấm <strong>"Lưu minh chứng"</strong> và nhập đúng Họ tên + MSSV (chỉ nhập được 1 lần cho mỗi lượt chơi).</li>
+    <li>Bấm <strong>"Xuất ảnh"</strong> để tải ảnh minh chứng (PNG) về máy. Bạn có thể xuất lại bất cứ lúc nào nếu làm mất ảnh.</li>
+    <li>Đăng ảnh minh chứng lên <strong>Story Facebook cá nhân</strong>.</li>
+    <li>Chụp màn hình Story vừa đăng để làm minh chứng tham gia.</li>
+    <li>Bấm <strong>"Nộp minh chứng"</strong> (hoặc truy cập liên kết minh chứng do Ban tổ chức cung cấp), điền thông tin yêu cầu và tải lên ảnh chụp màn hình Story để hoàn tất việc xác nhận tham gia và cộng điểm rèn luyện (DRL).</li>
 </ol>
 <div class="guide-credit">
     <span>Credit:</span>
