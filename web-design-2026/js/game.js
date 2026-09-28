@@ -537,6 +537,23 @@ export function createGame({ dom, state }) {
     }
   }
 
+  async function handleGgFormClick(e) {
+    if (e) e.preventDefault();
+    await showModalAlert({
+      title: TEXTS.MODALS.SUBMIT_PROOF_NOTICE.title,
+      message: TEXTS.MODALS.SUBMIT_PROOF_NOTICE.message,
+      mascot: 'assets/mascot/mascot-idle.png',
+      btnText: TEXTS.MODALS.SUBMIT_PROOF_NOTICE.btnText,
+      onConfirm: () => {
+        if (!GGFORM_URL) return;
+        const newTab = window.open(GGFORM_URL, '_blank', 'noopener,noreferrer');
+        if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+          window.location.href = GGFORM_URL;
+        }
+      },
+    });
+  }
+
   function init() {
     renderTopic();
     renderGrid();
@@ -636,6 +653,7 @@ export function createGame({ dom, state }) {
     handleInfoSubmit,
     handleExportAction,
     handleCannotExportAction,
+    handleGgFormClick,
     handleReset,
     handleHintClick,
     autoSolve,

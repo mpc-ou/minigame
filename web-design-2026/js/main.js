@@ -163,6 +163,9 @@ function launchGame(state) {
     if (dom.cannotExportBtn) {
       dom.cannotExportBtn.onclick = () => gameInstance.handleCannotExportAction();
     }
+    if (dom.ggformLinkEl) {
+      dom.ggformLinkEl.onclick = (e) => gameInstance.handleGgFormClick(e);
+    }
 
     if (dom.closeInfoBtn) {
       dom.closeInfoBtn.onclick = () => gameInstance.closeInfoDialog();
