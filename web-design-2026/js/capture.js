@@ -91,10 +91,10 @@ function buildCaptureCard(state, grid, placements) {
       </div>
 
       <div class="capture-player">
-        <p class="capture-name">${escapeHtml(state.fullName)}</p>
+        // <p class="capture-name">${escapeHtml(state.fullName)}</p>
         <p class="capture-meta">
-          <span>MSSV ${escapeHtml(state.studentId)}</span>
-          <span class="capture-dot">&bull;</span>
+          // <span>MSSV ${escapeHtml(state.studentId)}</span>
+          // <span class="capture-dot">&bull;</span>
           <span>${winTimeStr}</span>
           <span class="capture-dot">&bull;</span>
           <span class="capture-hash">#${hash}</span>
